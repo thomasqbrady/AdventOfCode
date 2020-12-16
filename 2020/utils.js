@@ -8,8 +8,9 @@ exports.log = function() {
 }
 
 exports.numSort = function(arr) {
-  arr.sort((a, b) => a-b);
-  return arr;
+  let newArr = [...arr];
+  newArr.sort((a, b) => a-b);
+  return newArr;
 }
 
 exports.arrayStrToNum = function(arr) {

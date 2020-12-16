@@ -33,68 +33,29 @@ function findFirstBus(arrivalTime, schedule) {
 
 // findFirstBus(arrivalTime, schedule);
 
-function findGoldenCoinTime(arrivalTime, schedule) {
-  let longestRoute = 0;
-  let scheduleNums = []
-  let goldenOffsets = []
-  schedule.forEach((routeLength) => {
-    if (routeLength != 'x') {
-      let length = parseInt(routeLength, 10);
-      scheduleNums.push(length);
-      if (length > longestRoute) {
-        longestRoute = length;
-      }
-    } else {
-      scheduleNums.push(-1);
-    }
+/*
+// Credit where it's due, I could not figure this one out, even 
+// when I thought I understood the CRT method. This is copy pasta
+// from https://github.com/tpatel/advent-of-code-2020/blob/main/day13.js
+*/
+
+function findGoldenCoinTime(buses) {
+  const timestamps = [];
+
+  buses.forEach((bus, index) => {
+      if(bus != 'x') timestamps.push({id: parseInt(bus), delta: index});
   });
-  // Only need to check the interval of the longest route
-  let longestRouteIndex = schedule.indexOf(longestRoute.toString());
-  for (let i = 0;i < scheduleNums.length;i++) {
-    if (schedule[i] == 'x') {
-      goldenOffsets.push('x')
-    } else {
-      goldenOffsets.push(scheduleNums.length - (longestRouteIndex + i));
-    }
-  }
-  let foundIt = false;
-  let timestamp;
-  let i = 100000000000000;
-  // let i = 0;
-  while(!foundIt) {
-    // log('while');
-    i++;
-    let paceBusDepartureTime = i * longestRoute;
-    // log(paceBusDepartureTime);
-    let offsets = [];
-    for (let j = 0;j < scheduleNums.length;j++) {
-      // log('for');
-      let busInterval = scheduleNums[j];
-      if (busInterval != -1) {
-        let nearestDepartureCount;
-        if (j > longestRouteIndex) {
-          nearestDepartureCount = Math.ceil(paceBusDepartureTime / busInterval);
-        } else {
-          nearestDepartureCount = Math.floor(paceBusDepartureTime / busInterval);
-        }
-        // log(paceBusDepartureTime - (nearestDepartureCount * busInterval) != goldenOffsets[j]);
-        if (paceBusDepartureTime - (nearestDepartureCount * busInterval) != goldenOffsets[j]) {
-          // log('break ' + j);
-          break;
-        } else {
-          // log('match ' + j);
-          offsets.push(paceBusDepartureTime - (nearestDepartureCount * busInterval));
-        }
-        // log(`bus: ${ busInterval } ${ (nearestDepartureCount * busInterval) } paceBus: ${ paceBusDepartureTime }`);
-      } else {
-        offsets.push('x');
+
+  let step = timestamps[0].id;
+  let t = step;
+
+  for(let j=1; j<timestamps.length; j++) {
+      while((t+timestamps[j].delta) % timestamps[j].id !== 0) {
+          t += step;
       }
-    }
-    foundIt = (offsets.join('') == goldenOffsets.join(''));
-    // foundIt = j == scheduleNums.length;
-    timestamp = paceBusDepartureTime;
+      step *= timestamps[j].id;
   }
-  log(timestamp);
+  console.log(t);
 }
 
-findGoldenCoinTime(arrivalTime, schedule.split(','));
+findGoldenCoinTime(schedule.split(','));
