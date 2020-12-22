@@ -442,6 +442,7 @@ function solveLine(line, firstNumber = undefined) {
 }
 
 function doHomework(lines) {
+	log(lines);
 	sum = 0;
 	lines.forEach((line) => {
 		let collapsed = collapseParentheses(line);
@@ -457,11 +458,38 @@ function doHomework2(lines) {
 		for (let i = 0;i < parts.length;i++) {
 			if (parts[i] == '+') {
 				parts[i-1] = '(' + parts[i-1];
-				parts[i+1] = parts[i+1] + ')';
+				// log(`encountered a + at ${ i }`);
+				let nextNumber = parts[i+1];
+				// log(`does next number start or end in paren? ${ nextNumber.substr(0,1) } or ${ nextNumber.substr(nextNumber.length - 1) }`);
+				if (parts[i+1].substr(parts[i+1].length - 1) != ')' && nextNumber.substr(0,1) != '(') {
+					// log('no, so we add it');
+					parts[i+1] = parts[i+1] + ')'
+				} else {
+					// log('yes, so we start the search');
+					let nests = 1;
+					for (let j = i+2;j < parts.length;j++) {
+						// log(`next part is ${ parts[j] }`);
+						if (parts[j] != '+' && parts[j] != '*') {
+							// log(`which is not + or *`);
+							if (parts[j].substr(0,1) == '(') {
+								nests++;
+								// log(`found a ( at ${ j } bringin nests to ${ nests }`);
+							}
+							if (parts[j].substr(parts[j].length - 1) == ')') {
+								nests--;
+								// log(`found a ) at ${ j } bringin nests to ${ nests }`);
+							}
+							if (nests == 0) {
+								parts[j] = parts[j] + ')';
+								// log(`add closing paren: ${ parts[j] }`);
+							}
+						}
+					}
+				}
 				i++;
 			}
 		}
-		log(parts);
+		log(doHomework([parts.join(' ')]));
 	});
 	// sum = 0;
 	// lines.forEach((line) => {
@@ -476,3 +504,24 @@ function doHomework2(lines) {
 doHomework2(lines);
 
 //giving up on round 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
