@@ -1,3 +1,5 @@
+// REMOVED THE SOLUTION TO PART ONE ACCIDENTALLY
+
 const fs = require('fs');
 const input = fs.readFileSync('./input.txt', 'utf8');
 // const input = fs.readFileSync('./test.txt', 'utf8');

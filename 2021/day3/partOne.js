@@ -1,6 +1,5 @@
 const fs = require('fs');
-const { posix } = require('path/posix');
-const input = fs.readFileSync('./input.txt', 'utf8');
+const input = fs.readFileSync('./test.txt', 'utf8');
 
 let logs = input.split('\n');
 
