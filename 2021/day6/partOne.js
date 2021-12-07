@@ -1,8 +1,8 @@
 const fs = require('fs');
-const input = fs.readFileSync('./test.txt', 'utf8');
+const input = fs.readFileSync('./input.txt', 'utf8');
 
 let fishList = input.split(',');
-let numberOfDays = 256;
+let numberOfDays = 80;
 
 function outputToFile(contents, filename) {
   fs.writeFile(filename, JSON.stringify(contents), (err) =>{
