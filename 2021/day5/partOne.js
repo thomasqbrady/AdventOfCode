@@ -1,5 +1,5 @@
 const fs = require('fs');
-const input = fs.readFileSync('./test.txt', 'utf8');
+const input = fs.readFileSync('./input.txt', 'utf8');
 
 let inputCoordinatePairs = input.split('\n');
 
@@ -21,14 +21,12 @@ inputCoordinatePairs.forEach((coordinatePairs) => {
   let y2 = parseInt(secondPair[1], 10);
 
   if (x1 === x2) {
-    console.log('plotting', {x1,y1,x2,y2});
     //vertical line
     if (!map[x1]) {
       map[x1] = {};
     }
     let i = 0;
     while ((y2 > y1) ? (y1 + i <= y2) : (y1 + i >= y2) ) {
-      console.log(i);
       if (!map[x1][y1 + i]) {
         map[x1][y1 + i] = 0;
       }
@@ -42,16 +40,15 @@ inputCoordinatePairs.forEach((coordinatePairs) => {
   }
   if (y1 === y2) {
     //horizontal line
-    if (!map[y1]) {
-      map[y1] = {};
-    }
     let i = 0;
     while ((x2 > x1) ? (x1 + i <= x2) : (x1 + i >= x2) ) {
-      console.log(i);
-      if (!map[y1][x1 + i]) {
-        map[y1][x1 + i] = 0;
+      if (!map[x1 + i]) {
+        map[x1 + i] = {};
       }
-      map[y1][x1 + i] += 1;
+      if (!map[x1 + i][y1]) {
+        map[x1 + i][y1] = 0;
+      }
+      map[x1 + i][y1] += 1;
       if (x2 > x1) {
         i++;
       } else {
@@ -61,3 +58,13 @@ inputCoordinatePairs.forEach((coordinatePairs) => {
   }
 });
 console.log({map});
+let scaryCount = 0;
+for (let col in map) {
+  let column = map[col];
+  for (let row in column) {
+    if (column[row] >= 2) {
+      scaryCount++;
+    }
+  }
+}
+console.log(scaryCount);
