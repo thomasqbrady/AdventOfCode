@@ -1,5 +1,5 @@
 const fs = require('fs');
-const input = fs.readFileSync('./test.txt', 'utf8');
+const input = fs.readFileSync('./input.txt', 'utf8');
 
 console.log('===============================================');
 console.log('===  S        T        A        R        T  ===');
@@ -16,17 +16,19 @@ let readings = input.split('\n');
 let width = readings[0].length;
 let height = readings.length;
 
-let basins = {}
+let basinsByPosition = {};
+let basinsByID = [];
 
-function exploreBasin(checkPosition, basin) {
-  console.log('checking',checkPosition.x,checkPosition.y);
+function exploreBasin(checkPosition, basinID) {
+  // console.log({checkPosition, basinID, basinsByPosition});
   if (!checkPosition.reading) {
     checkPosition.reading = parseInt(readings[checkPosition.y][checkPosition.x]);
   }
   let up, right, down, left;
   let x = checkPosition.x;
   let y = checkPosition.y;
-  basin[`${x}:${y}`] = true;
+  basinsByPosition[`${x}:${y}`] = basinID;
+  basinsByID[basinID-1].push(`${x}:${y}`);
   if (y > 0) {
     up = {
       reading: parseInt(readings[y - 1][x], 10),
@@ -55,19 +57,38 @@ function exploreBasin(checkPosition, basin) {
       y: y
     };
   }
-  console.log(up, right, down, left);
+  // console.log(up, right, down, left);
   [up, right, down, left].forEach((position) => {
-    if (position && position.reading !== 9 && !basin[`${position.x}:${position.y}`]) {
-      exploreBasin(position);
+    if (position && position.reading !== 9 && !basinsByPosition[`${position.x}:${position.y}`]) {
+      // console.log({position}, !basinsByPosition[`${position.x}:${position.y}`]);
+      exploreBasin(position, basinID);
     }
   })
 }
-for (let row = 0;row < 1;row++) {
+for (let row = 0;row < height;row++) {
   for (let col = 0;col < width;col++) {
-    if (parseInt(readings[row][col], 10) !== 9) {
-      let newBasinID = Object.keys(basins).length;
-      basins[newBasinID] = {};
-      exploreBasin
+    if (parseInt(readings[row][col], 10) !== 9 && !basinsByPosition[`${col}:${row}`]) {
+      let newBasinID = Object.keys(basinsByID).length + 1;
+      basinsByID.push([]);
+      exploreBasin({reading: null, x: col, y: row}, newBasinID);
     }
   }
 }
+
+let total = 1;
+
+let basinSizes = basinsByID.map((basin) => {
+  return basin.length;
+});
+
+basinSizes.sort((a,b) => {
+  return (a > b) ? 1 : (a < b) ? -1 : 0;
+});
+
+console.log(basinSizes);
+
+for (let i = basinSizes.length - 1;i > basinSizes.length - 4;i--) {
+  total *= basinSizes[i];
+}
+
+console.log(total);
