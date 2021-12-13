@@ -35,32 +35,46 @@ instructions.forEach((instruction, instructionIndex) => {
   }
   let parts = instruction.split(' ')[2].split('=');
   let direction = parts[0];
-  let place = parts[1];
+  let place = parseInt(parts[1], 10);
   switch (direction) {
     case 'x' :
       // console.log({paper});
       paper.forEach((row) => {
+        console.log('before', place);
+        console.log({row});
         row.forEach((dot, index) => {
+          console.log({dot, index});
           if (dot > place) {
-            let newDot = 10 - dot;
+            // let newDot = 10 - dot;
+            let newDot = place - Math.abs(place - dot);
+            console.log(dot, 'becomes', newDot);
             if (!row.includes(newDot)) {
               row[index] = newDot;
             } else {
-              row.splice(index, 1);
+              row[index] = -1;
             }
           }
         });
+        while (row.indexOf(-1) >= 0) {
+          row.splice(row.indexOf(-1),1);
+        }
+        console.log('after');
+        console.log({row});
       });
       break;
     case 'y' :
       paper.splice(place,1);
-      let bottom = paper.splice(place).reverse();
+      let bottom = paper.splice(place);
       bottom.forEach((dots, row) => {
+        console.log('before');
+        console.log({dots});
         dots.forEach((dot) => {
-          if (!paper[row].includes(dot)) {
-            paper[row].push(dot);
+          if (!paper[(paper.length - 1) - row].includes(dot)) {
+            paper[(paper.length - 1) - row].push(dot);
           }
         })
+        console.log('after');
+        console.log({dots});
       });
       break;
   }
@@ -70,4 +84,4 @@ let dotCount = 0;
 paper.forEach((row) => {
   dotCount += row.length;
 });
-console.log({dotCount})
+console.log({paper, dotCount})
