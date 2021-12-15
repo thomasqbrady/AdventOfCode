@@ -1,5 +1,5 @@
 const fs = require('fs');
-const input = fs.readFileSync('./input.txt', 'utf8');
+const input = fs.readFileSync('./test.txt', 'utf8');
 
 console.log('===============================================');
 console.log('===  S        T        A        R        T  ===');
@@ -15,44 +15,82 @@ let parts = input.split('\n\n');
 let polymer = parts[0];
 let rules = parts[1].split('\n');
 
-let steps = 10;
+let ruleMap = {};
 
-for (let i = 0;i < steps;i++) {
-  let chains = [];
-  for (let j=0;j < polymer.length - 1;j++) {
-    chains.push(polymer.substr(j, 2));
-  }
-  chains.forEach((chain, index) => {
-    // console.log({chain});
-    rules.forEach((rule) => {
-      let [match, insertion] = rule.split(' -> ');
-      if (chain === match) {
-        // console.log({match});
-        let [left, right] = chain.split('');
-        chains[index] = left + insertion;
-        if (index === chains.length - 1) {
-          chains[index] += right;
-        }
-      }
-    });
-  });
-  polymer = chains.join('');
-}
+rules.forEach((rule) => {
+  let ruleParts = rule.split(' -> ');
+  ruleMap[ruleParts[0]] = ruleParts[1];
+})
 
 let counts = {};
-polymer.split('').forEach((character) => {
+let pairs = {};
+
+polymer.split('').forEach((character, index) => {
+  if (index < polymer.length - 1) {
+    let pair = character + polymer.substring(index + 1, index + 2);
+    if (!pairs[pair]) {
+      pairs[pair] = 0;
+    }
+    pairs[pair] += 1;
+  }
   if (!counts[character]) {
     counts[character] = 0;
   }
   counts[character] += 1;
 });
-let most = 0, least = 1000000;
-for (let character in counts) {
-  if (counts[character] > most) {
-    most = counts[character];
+
+console.log({pairs, counts});
+
+function polymerize(steps) {
+  function react(pair, generation) {
+    if (generation >= steps) {
+      return
+    }
+    // console.log({pair, generation, steps});
+    let match = ruleMap[pair];
+    // console.log(pair + '->' + match + 'x' + pairs[pair]);
+    generation += 1;
+    pairs[pair] -= 1;
+    if (pairs[pair] === 0) {
+      delete pairs[pair];
+    }
+    let [first, second] = pair.split('');
+    let leftPair = first + match;
+    let rightPair = match + second;
+    // console.log('+' + leftPair + ' ' + rightPair);
+    if (!pairs[leftPair]) {
+      pairs[leftPair] = 0;
+    }
+    pairs[leftPair] += 1;
+    if (!pairs[rightPair]) {
+      pairs[rightPair] = 0;
+    }
+    pairs[rightPair] += 1;
+    if (!counts[match]) {
+      counts[match] = 0;
+    }
+    counts[match] += 1;
+    react(leftPair, generation);
+    react(rightPair, generation);
   }
-  if (counts[character] < least) {
-    least = counts[character];
+  for (let pair in pairs) {
+    react(pair, 0);
   }
 }
+
+polymerize(40);
+
+console.log({pairs});
+
+let letters = Object.keys(counts);
+let most = 0;
+let least = 100000000;
+letters.forEach((letter) => {
+  if (counts[letter] > most) {
+    most = counts[letter];
+  }
+  if (counts[letter] < least) {
+    least = counts[letter];
+  }
+})
 console.log({most, least}, most - least);
