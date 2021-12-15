@@ -1,5 +1,5 @@
 const fs = require('fs');
-const input = fs.readFileSync('./test.txt', 'utf8');
+const input = fs.readFileSync('./input.txt', 'utf8');
 
 console.log('===============================================');
 console.log('===  S        T        A        R        T  ===');
@@ -42,15 +42,15 @@ polymer.split('').forEach((character, index) => {
 console.log({pairs, counts});
 
 function evolve(polymer, generations) {
-  console.log('evolve', polymer);
+  // console.log('evolve', polymer);
   function polymerize(polymer) {
-    console.log('polymerize');
+    // console.log('polymerize');
     return Object.keys(polymer).reduce((newPolymer, pair) => {
-      console.log({newPolymer, pair});
       let character = ruleMap[pair];
-      counts[character] = (counts[character] || 0) + 1;
-      newPolymer[pair[0] + character] = (newPolymer[pair[0] + character] || 0) + 1;
-      newPolymer[character + pair[1]] = (newPolymer[character + pair[1]] || 0) + 1;
+      // console.log({newPolymer, pair, character}, polymer[pair], newPolymer[pair]);
+      counts[character] = (counts[character] || 0) + polymer[pair];
+      newPolymer[pair[0] + character] = (newPolymer[pair[0] + character] || 0) + polymer[pair];
+      newPolymer[character + pair[1]] = (newPolymer[character + pair[1]] || 0) + polymer[pair];
       return newPolymer;
     }, {});
   }
@@ -58,10 +58,15 @@ function evolve(polymer, generations) {
     console.log({i});
     polymer = polymerize(polymer);
   }
-  console.log({polymer, counts});
+  // console.log({polymer, counts});
 }
 
-evolve(pairs, 1);
+evolve(pairs, 40);
+
+let values = Object.values(counts);
+// console.log(values);
+// console.log(Math.max(...values),Math.min(...values));
+console.log(Math.max(...values) - Math.min(...values));
 
 // let letters = Object.keys(counts);
 // let most = 0;
