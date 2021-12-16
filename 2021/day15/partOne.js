@@ -11,48 +11,21 @@ function outputToFile(contents, filename) {
   });
 }
 
-let parts = input.split('\n\n');
-let polymer = parts[0];
-let rules = parts[1].split('\n');
+let mazeRows = input.split('\n');
 
-let steps = 10;
+let inProgress = {
+  '0:0': 0
+};
+let finished = [];
 
-for (let i = 0;i < steps;i++) {
-  let chains = [];
-  for (let j=0;j < polymer.length - 1;j++) {
-    chains.push(polymer.substr(j, 2));
+while (Object.keys(inProgress).length > 0) {
+  for (let position in inProgress) {
+    let { x, y } = position.split(':');
+    let risk = inProgress[position];
+    if (x > 0) {
+      inProgress[`${x - 1}:${y}`] = risk + 
+    }
   }
-  chains.forEach((chain, index) => {
-    // console.log({chain});
-    rules.forEach((rule) => {
-      let [match, insertion] = rule.split(' -> ');
-      if (chain === match) {
-        // console.log({match});
-        let [left, right] = chain.split('');
-        chains[index] = left + insertion;
-        if (index === chains.length - 1) {
-          chains[index] += right;
-        }
-      }
-    });
-  });
-  polymer = chains.join('');
 }
 
-let counts = {};
-polymer.split('').forEach((character) => {
-  if (!counts[character]) {
-    counts[character] = 0;
-  }
-  counts[character] += 1;
-});
-let most = 0, least = 1000000;
-for (let character in counts) {
-  if (counts[character] > most) {
-    most = counts[character];
-  }
-  if (counts[character] < least) {
-    least = counts[character];
-  }
-}
-console.log({most, least}, most - least);
+// I GAVE UP
