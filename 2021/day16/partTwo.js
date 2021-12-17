@@ -11,86 +11,113 @@ function outputToFile(contents, filename) {
   });
 }
 
-let parts = input.split('\n\n');
-let polymer = parts[0];
-let rules = parts[1].split('\n');
-
-let ruleMap = {};
-
-rules.forEach((rule) => {
-  let ruleParts = rule.split(' -> ');
-  ruleMap[ruleParts[0]] = ruleParts[1];
-})
-
-let counts = {};
-let pairs = {};
-
-polymer.split('').forEach((character, index) => {
-  if (index < polymer.length - 1) {
-    let pair = character + polymer.substring(index + 1, index + 2);
-    if (!pairs[pair]) {
-      pairs[pair] = 0;
+function hex2bin(hex){
+    hex = hex.replace("0x", "").toLowerCase();
+    var out = "";
+    for(var c of hex) {
+        switch(c) {
+            case '0': out += "0000"; break;
+            case '1': out += "0001"; break;
+            case '2': out += "0010"; break;
+            case '3': out += "0011"; break;
+            case '4': out += "0100"; break;
+            case '5': out += "0101"; break;
+            case '6': out += "0110"; break;
+            case '7': out += "0111"; break;
+            case '8': out += "1000"; break;
+            case '9': out += "1001"; break;
+            case 'a': out += "1010"; break;
+            case 'b': out += "1011"; break;
+            case 'c': out += "1100"; break;
+            case 'd': out += "1101"; break;
+            case 'e': out += "1110"; break;
+            case 'f': out += "1111"; break;
+            default: return "";
+        }
     }
-    pairs[pair] += 1;
-  }
-  if (!counts[character]) {
-    counts[character] = 0;
-  }
-  counts[character] += 1;
-});
+    return out;
+}
 
-console.log({pairs, counts});
+let outermostPacket = input.split('\n')[0].trim();
+let binaryString = hex2bin(outermostPacket);
+console.log(binaryString);
+// binaryString = '00111000000000000110111101000101001010010001001000000000';
 
-function polymerize(steps) {
-  function react(pair, generation) {
-    if (generation >= steps) {
-      return
+let versionTotal = 0;
+function decodePacket(packetStart, nested = false) {
+  while (packetStart < binaryString.length) {
+    let version = parseInt(binaryString.substring(packetStart,packetStart + 3),2);
+    versionTotal += version;
+    let type = parseInt(binaryString.substring(packetStart + 3,packetStart + 6),2);
+    packetStart += 6
+    console.log({version, type});
+    switch (type) {
+      case 4 :
+        let stop = false;
+        let bits = '';
+        while (!stop) {
+          console.log({packetStart, bits})
+          bits += binaryString.substring(packetStart + 1, packetStart + 5);
+          console.log({bits});
+          if (binaryString.substring(packetStart, packetStart + 1) === '0') {
+            console.log('stop');
+            stop = true;
+          }
+          packetStart += 5;
+        }
+        // console.log(bits.length);
+        // packetStart += 4 - (((5 * (bits.length / 4)) + 6) % 4);
+        console.log({bits}, parseInt(bits, 2));
+        console.log({nested});
+        return { packetStart, value: parseInt(bits, 2) };
+        break;
+      default :
+        let lengthType = parseInt(binaryString.substring(packetStart, packetStart + 1), 2);
+        console.log({lengthType});
+        packetStart += 1;
+        switch (lengthType) {
+          case 0 :
+            let packetLength = parseInt(binaryString.substring(packetStart, packetStart + 15),2);
+            console.log({packetLength});
+            packetStart += 15;
+            let subPacketStart = packetStart;
+            while (packetStart - subPacketStart <= packetLength) {
+              let result = decodePacket(packetStart, true);
+              console.log({result})
+              if (result) {
+                packetStart = result.packetStart;
+              } else {
+                console.log({nested, packetStart, last: binaryString.length});
+                return null;
+              }
+              console.log(packetStart - subPacketStart);
+            }
+            console.log({nested});
+            break;
+          case 1:
+            let packetCount = parseInt(binaryString.substring(packetStart, packetStart + 11), 2);
+            console.log({packetCount});
+            packetStart += 11;
+            let processedPackets = 0;
+            while (processedPackets < packetCount) {
+              processedPackets++;
+              let result = decodePacket(packetStart, true);
+              console.log({result})
+              if (result) {
+                packetStart = result.packetStart;
+              } else {
+                console.log({nested, packetStart, last: binaryString.length});
+                return null;
+              }
+            }
+            console.log({nested});
+            break;
+        }
+        break;
     }
-    // console.log({pair, generation, steps});
-    let match = ruleMap[pair];
-    // console.log(pair + '->' + match + 'x' + pairs[pair]);
-    generation += 1;
-    pairs[pair] -= 1;
-    if (pairs[pair] === 0) {
-      delete pairs[pair];
-    }
-    let [first, second] = pair.split('');
-    let leftPair = first + match;
-    let rightPair = match + second;
-    // console.log('+' + leftPair + ' ' + rightPair);
-    if (!pairs[leftPair]) {
-      pairs[leftPair] = 0;
-    }
-    pairs[leftPair] += 1;
-    if (!pairs[rightPair]) {
-      pairs[rightPair] = 0;
-    }
-    pairs[rightPair] += 1;
-    if (!counts[match]) {
-      counts[match] = 0;
-    }
-    counts[match] += 1;
-    react(leftPair, generation);
-    react(rightPair, generation);
-  }
-  for (let pair in pairs) {
-    react(pair, 0);
   }
 }
 
-polymerize(40);
 
-console.log({pairs});
-
-let letters = Object.keys(counts);
-let most = 0;
-let least = 100000000;
-letters.forEach((letter) => {
-  if (counts[letter] > most) {
-    most = counts[letter];
-  }
-  if (counts[letter] < least) {
-    least = counts[letter];
-  }
-})
-console.log({most, least}, most - least);
+decodePacket(0);
+console.log({versionTotal});
