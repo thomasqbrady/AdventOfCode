@@ -53,6 +53,7 @@ function decodePacket(packetStart) {
     console.log({version, type});
     switch (type) {
       case 4 :
+        // console.log('START LITERAL');
         let stop = false;
         let bits = '';
         while (!stop) {
@@ -60,7 +61,7 @@ function decodePacket(packetStart) {
           bits += binaryString.substring(packetStart + 1, packetStart + 5);
           console.log({bits});
           if (binaryString.substring(packetStart, packetStart + 1) === '0') {
-            console.log('stop');
+            // console.log('stop');
             stop = true;
           }
           packetStart += 5;
@@ -68,39 +69,122 @@ function decodePacket(packetStart) {
         // console.log(bits.length);
         // packetStart += 4 - (((5 * (bits.length / 4)) + 6) % 4);
         console.log({bits}, parseInt(bits, 2));
-        return packetStart;
-        break;
+        // console.log('END LITERAL');
+        return { packetStart, value: parseInt(bits, 2)};
       default :
+        // console.log('START OPERATOR');
         let lengthType = parseInt(binaryString.substring(packetStart, packetStart + 1), 2);
-        console.log({lengthType});
+        // console.log({lengthType});
         packetStart += 1;
+        let values, subPacketValue;
         switch (lengthType) {
           case 0 :
+            // console.log('START OPERATOR LENGTH TYPE 0');
             let packetLength = parseInt(binaryString.substring(packetStart, packetStart + 15),2);
-            console.log({packetLength});
+            // console.log({packetLength});
             packetStart += 15;
             let subPacketStart = packetStart;
-            while (packetStart - subPacketStart <= packetLength) {
-              packetStart = decodePacket(packetStart);
-              console.log(packetStart - subPacketStart);
+            values = [];
+            while (packetStart - subPacketStart < packetLength) {
+              // console.log('case 0 while loop', packetStart - subPacketStart, packetLength, packetStart - subPacketStart <= packetLength);
+              let result = decodePacket(packetStart);
+              values.push(result.value);
+              packetStart = result.packetStart;
+              // console.log(packetStart - subPacketStart, packetLength);
             }
-            break;
+            switch (type) {
+              case 0 : // SUM
+                subPacketValue = values.reduce((accum, value) => {
+                  return accum + value;
+                }, 0);
+                console.log('type 0 SUM is', values, subPacketValue);
+                break;
+              case 1 : // PRODUCT
+                subPacketValue = values.reduce((accum, value) => {
+                  return accum * value;
+                }, 1);
+                console.log('type 0 PRODUCT is', values, subPacketValue);
+                break;
+              case 2 : // MIN
+                subPacketValue = Math.min(...values);
+                console.log('type 0 MIN is', values, subPacketValue);
+                break;
+              case 3 : // MAX
+                subPacketValue = Math.max(...values);
+                console.log('type 0 MIN is', values, subPacketValue);
+                break;
+              case 5 : // >
+                subPacketValue = (values[0] > values[1]) ? 1 : 0;
+                console.log('type 0 > is', values, subPacketValue);
+                break;
+              case 6 : // <
+                subPacketValue = (values[0] < values[1]) ? 1 : 0;
+                console.log('type 0 < is', values, subPacketValue);
+                break;
+              case 7 : // ===
+                subPacketValue = (values[0] === values[1]) ? 1 : 0;
+                console.log('type 0 === is', values, subPacketValue);
+                break;
+            }
+            console.log('END OPERATOR LENGTH TYPE 0');
+            return { packetStart, value: subPacketValue };
           case 1:
+            // console.log('START OPERATOR LENGTH TYPE 1');
             let packetCount = parseInt(binaryString.substring(packetStart, packetStart + 11), 2);
-            console.log({packetCount});
+            // console.log({packetCount});
             packetStart += 11;
             let processedPackets = 0;
+            values = [];
             while (processedPackets < packetCount) {
               processedPackets++;
-              packetStart = decodePacket(packetStart);
+              let result = decodePacket(packetStart);
+              values.push(result.value);
+              packetStart = result.packetStart;
             }
-            break;
+            switch (type) {
+              case 0 : // SUM
+                subPacketValue = values.reduce((accum, value) => {
+                  return accum + value;
+                }, 0);
+                console.log('type 0 SUM is', values, subPacketValue);
+                break;
+              case 1 : // PRODUCT
+                subPacketValue = values.reduce((accum, value) => {
+                  return accum * value;
+                }, 1);
+                console.log('type 0 PRODUCT is', values, subPacketValue);
+                break;
+              case 2 : // MIN
+                subPacketValue = Math.min(...values);
+                console.log('type 0 MIN is', values, subPacketValue);
+                break;
+              case 3 : // MAX
+                subPacketValue = Math.max(...values);
+                console.log('type 0 MIN is', values, subPacketValue);
+                break;
+              case 5 : // >
+                subPacketValue = (values[0] > values[1]) ? 1 : 0;
+                console.log('type 0 > is', values, subPacketValue);
+                break;
+              case 6 : // <
+                subPacketValue = (values[0] < values[1]) ? 1 : 0;
+                console.log('type 0 < is', values, subPacketValue);
+                break;
+              case 7 : // ===
+                subPacketValue = (values[0] === values[1]) ? 1 : 0;
+                console.log('type 0 === is', values, subPacketValue);
+                break;
+            }
+            console.log('END OPERATOR LENGTH TYPE 1');
+            return { packetStart, value: subPacketValue};
         }
-        break;
+        // console.log('end of decodePacket');
+        // break;
     }
+    // console.log('end of while loop');
   }
 }
 
 
-decodePacket(0);
-console.log({versionTotal});
+let thing = decodePacket(0);
+console.log({versionTotal, thing});
