@@ -62,8 +62,8 @@ namespace com.thomasqbrady
         static void PartTwo() {
             // string input = System.IO.File.ReadAllText(@"test.txt");
             string input = System.IO.File.ReadAllText(@"input.txt");
-            Console.WriteLine("Input:\n{0}", input);
-            Console.WriteLine("===========");
+            // Console.WriteLine("Input:\n{0}", input);
+            // Console.WriteLine("===========");
             int score = 0;
             string[] rounds = input.Split("\n");
             foreach(string round in rounds) {
@@ -72,23 +72,21 @@ namespace com.thomasqbrady
                 string outcome = moves[1];
                 int losingPlay = (opponentMove - 1 > 0) ? opponentMove - 1 : 3;
                 int winningPlay = (opponentMove + 1 <= 3) ? opponentMove + 1 : 1;
-
-
                 switch (outcome) {
                     // if we are to lose, we only get the points of their move
                     case "X":
                         score += losingPlay;
-                        Console.WriteLine("Opponent played {0}, so you played {1} to lose getting {2} points", moves[0], losingPlay, losingPlay);
+                        // Console.WriteLine("Opponent played {0}, so you played {1} to lose getting {2} points", moves[0], losingPlay, losingPlay);
                         break;
                     // if we are to tie we get points for our play and for tieing
                     case "Y":
                         score += 3 + opponentMove;
-                        Console.WriteLine("Opponent played {0}, so you played {1} to tie getting {2} points", moves[0], moves[0], opponentMove + 3);
+                        // Console.WriteLine("Opponent played {0}, so you played {1} to tie getting {2} points", moves[0], moves[0], opponentMove + 3);
                         break;
                     // if we are to win we get points for our play and for winning
                     case "Z":
                         score += 6 + winningPlay;
-                        Console.WriteLine("Opponent played {0}, so you played {1} to win getting {2} points", moves[0], winningPlay, winningPlay + 6);
+                        // Console.WriteLine("Opponent played {0}, so you played {1} to win getting {2} points", moves[0], winningPlay, winningPlay + 6);
                         break;
                 }
             }
