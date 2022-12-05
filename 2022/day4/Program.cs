@@ -135,7 +135,7 @@ namespace com.thomasqbrady
                     three = "";
                 }
             }
-            Console.WriteLine("Sum of priority is {0}", score);
+            Console.WriteLine("Sum or priority is {0}", score);
         }
     }
 }
