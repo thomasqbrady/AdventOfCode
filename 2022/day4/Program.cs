@@ -19,87 +19,26 @@ namespace com.thomasqbrady
             string input = System.IO.File.ReadAllText(@"input.txt");
             // Console.WriteLine("Input:\n{0}", input);
             // Console.WriteLine("===========");
-            int score = 0;
-            string[] sacks = input.Split("\n");
-            foreach (string sack in sacks)
+            int fullOverlaps = 0;
+            string[] rows = input.Split("\n");
+            foreach (string row in rows)
             {
-                int length = sack.Length;
-                string alreadySearched = "";
-                bool keepGoing = true;
-                int index = 0;
-                while (keepGoing)
-                {
-                    string letter = sack[index].ToString();
-                    if (alreadySearched.Contains(letter))
-                    {
-                        index++;
+                string[] assignments = row.Split(",");
+                string[] firstAssignment = assignments[0].Split("-");
+                int firstAssignmentStart = int.Parse(firstAssignment[0]);
+                int firstAssignmentEnd = int.Parse(firstAssignment[1]);
+                string[] secondAssignment = assignments[1].Split("-");
+                int secondAssignmentStart = int.Parse(secondAssignment[0]);
+                int secondAssignmentEnd = int.Parse(secondAssignment[1]);
+                if (secondAssignmentStart >= firstAssignmentStart && secondAssignmentEnd <= firstAssignmentEnd) {
+                    fullOverlaps++;
+                } else {
+                    if (firstAssignmentStart >= secondAssignmentStart && firstAssignmentEnd <= secondAssignmentEnd) {
+                        fullOverlaps++;
                     }
-                    else
-                    {
-                        alreadySearched += letter;
-                        bool foundDuplicate = sack.LastIndexOf(letter) >= length / 2;
-                        if (foundDuplicate)
-                        {
-                            keepGoing = false;
-                            int priority = 0;
-                            int letterAsciiCode = (int)letter.ToCharArray()[0];
-                            if (letterAsciiCode >= 97)
-                            {
-                                priority = letterAsciiCode - 96;
-                            }
-                            else
-                            {
-                                priority = letterAsciiCode - 38;
-                            }
-                            score += priority;
-                        }
-                        else
-                        {
-                            index++;
-                        }
-                    }
-                }
-
-            }
-            Console.WriteLine("Final score: {0}", score);
-        }
-
-        static int FindBadgePriority(string one, string two, string three)
-        {
-            string alreadySearched = "";
-            bool keepGoing = true;
-            int priority = 0;
-            int index = 0;
-            while (keepGoing)
-            {
-                string letter = one[index].ToString();
-                if (!alreadySearched.Contains(letter))
-                {
-                    alreadySearched += letter;
-                    if (two.Contains(letter) && three.Contains(letter))
-                    {
-                        int letterAsciiCode = (int)letter.ToCharArray()[0];
-                        if (letterAsciiCode >= 97)
-                        {
-                            priority = letterAsciiCode - 96;
-                        }
-                        else
-                        {
-                            priority = letterAsciiCode - 38;
-                        }
-                        keepGoing = false;
-                    }
-                    else
-                    {
-                        index++;
-                    }
-                }
-                else
-                {
-                    index++;
                 }
             }
-            return priority;
+            Console.WriteLine("Full overlaps: {0}", fullOverlaps);
         }
 
         static void PartTwo()
@@ -108,34 +47,32 @@ namespace com.thomasqbrady
             string input = System.IO.File.ReadAllText(@"input.txt");
             // Console.WriteLine("Input:\n{0}", input);
             // Console.WriteLine("===========");
-            int score = 0;
-            string one = "";
-            string two = "";
-            string three = "";
-            string[] sacks = input.Split("\n");
-            foreach (string sack in sacks)
+            int partialOverlaps = 0;
+            string[] rows = input.Split("\n");
+            foreach (string row in rows)
             {
-                if (one == "")
-                {
-                    one = sack;
-                    continue;
-                }
-                if (two == "")
-                {
-                    two = sack;
-                    continue;
-                }
-                if (three == "")
-                {
-                    three = sack;
-                    int priority = FindBadgePriority(one, two, three);
-                    score += priority;
-                    one = "";
-                    two = "";
-                    three = "";
+                string[] assignments = row.Split(",");
+                string[] firstAssignment = assignments[0].Split("-");
+                int firstAssignmentStart = int.Parse(firstAssignment[0]);
+                int firstAssignmentEnd = int.Parse(firstAssignment[1]);
+                string[] secondAssignment = assignments[1].Split("-");
+                int secondAssignmentStart = int.Parse(secondAssignment[0]);
+                int secondAssignmentEnd = int.Parse(secondAssignment[1]);
+                // Console.WriteLine("sAS {0} >= fAS {1}: {2}",secondAssignmentStart, firstAssignmentStart, secondAssignmentStart >= firstAssignmentStart);
+                // Console.WriteLine("sAS {0} <= fAE {1}: {2}",secondAssignmentStart, firstAssignmentEnd, secondAssignmentStart <= firstAssignmentEnd);
+                // Console.WriteLine("=================");
+                if (secondAssignmentStart >= firstAssignmentStart && secondAssignmentStart <= firstAssignmentEnd) {
+                    partialOverlaps++;
+                } else {
+                    if (firstAssignmentStart >= secondAssignmentStart && firstAssignmentStart <= secondAssignmentEnd) {
+                        // Console.WriteLine("fAS {0} >= sAS {1}: {2}", firstAssignmentStart, secondAssignmentStart, firstAssignmentStart >= secondAssignmentStart);
+                        // Console.WriteLine("fAS {0} <= sAE {1}: {2}", secondAssignmentStart, secondAssignmentEnd, firstAssignmentStart <= secondAssignmentEnd);
+                        // Console.WriteLine("=================");
+                        partialOverlaps++;
+                    }
                 }
             }
-            Console.WriteLine("Sum or priority is {0}", score);
-        }
+            Console.WriteLine("Partial overlaps: {0}", partialOverlaps);
+       }
     }
 }
