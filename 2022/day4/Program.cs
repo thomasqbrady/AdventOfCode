@@ -4,7 +4,7 @@
 
 namespace com.thomasqbrady
 {
-    class Day3
+    class Day4
     {
 
         static void Main()
