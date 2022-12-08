@@ -12,16 +12,16 @@ namespace com.thomasqbrady
             // PartTwo();
         }
 
-        static string[,] make2DArray(string[] rows)
+        static int[,] make2DArray(string[] rows)
         {
             int length = rows.Length;
-            string[,] array2D = new string[length, length];
+            int[,] array2D = new int[length, length];
             int rowIndex = 0;
             foreach (string rowRaw in rows)
             {
                 for (int colIndex = 0; colIndex < length; colIndex++)
                 {
-                    array2D[colIndex, rowIndex] = rowRaw[colIndex].ToString();
+                    array2D[colIndex, rowIndex] = int.Parse(rowRaw[colIndex].ToString());
                 }
                 rowIndex++;
             }
@@ -35,8 +35,36 @@ namespace com.thomasqbrady
             return array2D;
         }
 
-        static List<string> check(int[] direction, List<string> candidates)
+        static List<string> check(int[] direction, List<string> candidates, int[,] array2D, int length)
         {
+            int rise = direction[1];
+            int run = direction[0];
+            List<string> toRemove = new List<string>();
+            foreach (string candidateAddress in candidates)
+            {
+                string[] bits = candidateAddress.Split(":");
+                int x = int.Parse(bits[0]);
+                int y = int.Parse(bits[1]);
+                // Console.WriteLine("candidate: {0}:{1} is {2}", x, y, array2D[x, y]);
+                int candidateHeight = array2D[x, y];
+                while (x > 0 && x < length - 1 && y > 0 && y < length - 1)
+                {
+                    x += run;
+                    y += rise;
+                    // Console.WriteLine("x: {0} y: {1}", x, y);
+                    int comparatorHeight = array2D[x, y];
+                    if (comparatorHeight >= candidateHeight)
+                    {
+                        toRemove.Add(candidateAddress);
+                        // Console.WriteLine("Candidate {0} will be removed", candidateAddress);
+                    }
+                }
+            }
+            foreach (string candidateAddress in toRemove)
+            {
+                // Console.WriteLine("Removing {0}", candidateAddress);
+                candidates.Remove(candidateAddress);
+            }
             return candidates;
         }
 
@@ -48,7 +76,7 @@ namespace com.thomasqbrady
             // Console.WriteLine("===========");
             string[] rows = input.Split("\n");
             int length = rows.Length;
-            string[,] array2D = make2DArray(rows);
+            int[,] array2D = make2DArray(rows);
             List<string> candidates = new List<string>();
             for (int x = 1; x < length - 1; x++)
             {
@@ -66,7 +94,17 @@ namespace com.thomasqbrady
             int[] right = { 1, 0 };
             int[] down = { 0, 1 };
             int[] left = { -1, 0 };
-            candidates = check(up, candidates);
+            Console.WriteLine("BEFORE UP");
+            foreach (var candidate in candidates)
+            {
+                Console.WriteLine(candidate);
+            }
+            candidates = check(up, candidates, array2D, length);
+            Console.WriteLine("AFTER");
+            foreach (var candidate in candidates)
+            {
+                Console.WriteLine(candidate);
+            }
         }
 
         static void PartTwo()
