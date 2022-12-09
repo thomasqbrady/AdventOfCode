@@ -60,7 +60,7 @@ namespace com.thomasqbrady
                 // Console.WriteLine("Move Y");
                 return approachY(diffY, tail);
             }
-            if (diffXAbs == 2 && diffYAbs == 1 || diffXAbs == 1 && diffYAbs == 2 || diffXAbs == 2 && diffYAbs == 2) {
+            if (diffXAbs > 1 || diffYAbs > 1) {
                 // Console.WriteLine("Move Diag");
                 tail = approachX(diffX, tail);
                 return approachY(diffY, tail);
