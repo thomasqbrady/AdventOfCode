@@ -17,6 +17,7 @@ namespace com.thomasqbrady
             // string input = System.IO.File.ReadAllText(@"input.txt");
             Console.WriteLine("Input:\n{0}", input);
             Console.WriteLine("===========");
+<<<<<<< HEAD
             
             using (StringReader reader = new StringReader(input))
             {
@@ -42,6 +43,8 @@ namespace com.thomasqbrady
                     rowIndex++;
                 } while (legendRow != null);
             }
+=======
+>>>>>>> b026943df17069c7386ba0f72d17ccb5be2a4c9e
         }
 
         static void PartTwo()
