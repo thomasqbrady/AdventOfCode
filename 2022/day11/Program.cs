@@ -6,12 +6,12 @@ namespace com.thomasqbrady
 {
     class Monkey
     {
-        public List<Int64> items = new List<Int64>();
+        public List<ulong> items = new List<ulong>();
         public string transform = "";
-        public Int64 val;
+        public ulong val;
         public int trueMonkey;
         public int falseMonkey;
-        public int divisor;
+        public ulong divisor;
         public int inspections = 0;
 
         public void LogMonkey() {
@@ -32,8 +32,8 @@ namespace com.thomasqbrady
             for (int i = 0;i < items.Count;i++) {
                 // Console.WriteLine("item {0}", items[i]);
                 inspections++;
-                Int64 operatorValue;
-                if (val >= 0) {
+                ulong operatorValue;
+                if (val > 0) {
                     operatorValue = val;
                 } else {
                     operatorValue = items[i];
@@ -57,14 +57,23 @@ namespace com.thomasqbrady
             for (int i = 0;i < items.Count;i++) {
                 // Console.WriteLine("item {0}", items[i]);
                 decimal bored = items[i] / 3;
-                items[i] = (Int64)Math.Floor(bored);
+                items[i] = (ulong)Math.Floor(bored);
+                // Console.WriteLine("becomes {0}", items[i]);
+            }
+        }
+
+        public void getBored2(ulong greatDivisor) {
+            // Console.WriteLine("--------BOREDOM");
+            for (int i = 0;i < items.Count;i++) {
+                // Console.WriteLine("item {0}", items[i]);
+                items[i] = (ulong)items[i] % greatDivisor;
                 // Console.WriteLine("becomes {0}", items[i]);
             }
         }
 
         public void toss(IDictionary<int, Monkey> monkeys) {
             // Console.WriteLine("--------TOSS");
-            foreach (Int64 item in items) {
+            foreach (ulong item in items) {
                 if (item % divisor == 0) {
                     // Console.WriteLine("divisible by {0}, tossing to {1}", divisor, trueMonkey);
                     monkeys[trueMonkey].items.Add(item);
@@ -73,7 +82,7 @@ namespace com.thomasqbrady
                     monkeys[falseMonkey].items.Add(item);
                 }
             }
-            items = new List<Int64>();
+            items = new List<ulong>();
         }
 
     }
@@ -106,13 +115,13 @@ namespace com.thomasqbrady
             Console.WriteLine(".....END ROUND.....");
         }
 
-        static void doRound2() {
+        static void doRound2(ulong greatDivisor) {
             Console.WriteLine("");
             Console.WriteLine(".....ROUND.....");
             for (int i = 0;i < monkeys.Count;i++) {
                 Console.WriteLine("Monkey {0}", i);
                 monkeys[i].inspect();
-                // monkeys[i].getBored();
+                monkeys[i].getBored2(greatDivisor);
                 monkeys[i].toss(monkeys);
                 // monkeys[i].LogMonkey();
             }
@@ -138,18 +147,18 @@ namespace com.thomasqbrady
                         } else if (instruction.StartsWith("  Starting")) {
                             string[] itemList = instruction.Split(": ")[1].Split(",");
                             foreach (string item in itemList) {
-                                monkeys[monkeys.Count - 1].items.Add(Int64.Parse(item.Trim()));
+                                monkeys[monkeys.Count - 1].items.Add(ulong.Parse(item.Trim()));
                             }
                         } else if (instruction.StartsWith("  Operation")) {
                             pieces = instruction.Split(" = old ")[1].Split(" ");
                             monkeys[monkeys.Count - 1].transform = pieces[0];
                             if (pieces[1] == "old") {
-                                monkeys[monkeys.Count - 1].val = -1;
+                                monkeys[monkeys.Count - 1].val = 0;
                             } else {
-                                monkeys[monkeys.Count - 1].val = Int64.Parse(pieces[1]);
+                                monkeys[monkeys.Count - 1].val = ulong.Parse(pieces[1]);
                             }
                         } else if (instruction.StartsWith("  Test")) {
-                            monkeys[monkeys.Count - 1].divisor = int.Parse(instruction.Split(" by ")[1]);
+                            monkeys[monkeys.Count - 1].divisor = ulong.Parse(instruction.Split(" by ")[1]);
                         } else if (instruction.StartsWith("    If true")) {
                             monkeys[monkeys.Count - 1].trueMonkey = int.Parse(instruction.Split(" monkey ")[1]);
                         } else if (instruction.StartsWith("    If false")) {
@@ -166,8 +175,9 @@ namespace com.thomasqbrady
 
         static void PartTwo()
         {
-            string input = System.IO.File.ReadAllText(@"test.txt");
-            // string input = System.IO.File.ReadAllText(@"input.txt");
+            ulong greatDivisor = 1;
+            // string input = System.IO.File.ReadAllText(@"test.txt");
+            string input = System.IO.File.ReadAllText(@"input.txt");
             // Console.WriteLine("Input:\n{0}", input);
             // Console.WriteLine("===========");
             using (StringReader reader = new StringReader(input))
@@ -183,18 +193,20 @@ namespace com.thomasqbrady
                         } else if (instruction.StartsWith("  Starting")) {
                             string[] itemList = instruction.Split(": ")[1].Split(",");
                             foreach (string item in itemList) {
-                                monkeys[monkeys.Count - 1].items.Add(Int64.Parse(item.Trim()));
+                                monkeys[monkeys.Count - 1].items.Add(ulong.Parse(item.Trim()));
                             }
                         } else if (instruction.StartsWith("  Operation")) {
                             pieces = instruction.Split(" = old ")[1].Split(" ");
                             monkeys[monkeys.Count - 1].transform = pieces[0];
                             if (pieces[1] == "old") {
-                                monkeys[monkeys.Count - 1].val = -1;
+                                monkeys[monkeys.Count - 1].val = 0;
                             } else {
-                                monkeys[monkeys.Count - 1].val = Int64.Parse(pieces[1]);
+                                monkeys[monkeys.Count - 1].val = ulong.Parse(pieces[1]);
                             }
                         } else if (instruction.StartsWith("  Test")) {
-                            monkeys[monkeys.Count - 1].divisor = int.Parse(instruction.Split(" by ")[1]);
+                            ulong divisor = ulong.Parse(instruction.Split(" by ")[1]);
+                            monkeys[monkeys.Count - 1].divisor = divisor;
+                            greatDivisor *= divisor;
                         } else if (instruction.StartsWith("    If true")) {
                             monkeys[monkeys.Count - 1].trueMonkey = int.Parse(instruction.Split(" monkey ")[1]);
                         } else if (instruction.StartsWith("    If false")) {
@@ -203,8 +215,8 @@ namespace com.thomasqbrady
                     }
                 } while (instruction != null);
             }
-            for (int i = 0;i < 1000;i++) {
-                doRound2();
+            for (int i = 0;i < 10000;i++) {
+                doRound2(greatDivisor);
             }
             logMonkeys();
          }
