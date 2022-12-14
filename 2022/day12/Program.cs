@@ -4,25 +4,23 @@
 
 namespace com.thomasqbrady
 {
-    public class Coords {
-        public int X;
-        public int Y;
-
-        public Coords(int x, int y) {
-            X = x;
-            Y = y;
-        }
-
-        public override string ToString() => $"{X}:{Y}";
+    public class Square
+    {
+        public char id;
+        public int x;
+        public int y;
+        public int height;
+        public int? distance;
     }
 
-    class Day
+    public class Map
     {
-        static IDictionary<string, int> map = new Dictionary<string, int>();
-        static Coords startPosition;
-        static Coords finishPosition;
-        static int lastRow = 0;
-        static int lastCol = 0;
+        public List<Square> Columns = new();
+        public List<List<Square>> Rows = new();
+    }
+
+    class Day12
+    {
 
         static void Main()
         {
@@ -30,121 +28,124 @@ namespace com.thomasqbrady
             // PartTwo();
         }
 
-        static void searchPath(Coords startFrom, List<string> visited) {
-            if (startFrom.ToString() == finishPosition.ToString()) {
-                Console.WriteLine("!!!!!!!!!!arrived!!!!!!!!!!");
-                Console.WriteLine("Took {0} steps", visited.Count);
-            // } else {
-            //     Console.WriteLine("{0} is not {1}", startFrom, finishPosition);
-            }
-            visited.Add(startFrom.ToString());
-            int startHeight = map["" + startFrom.X + ":" + startFrom.Y];
-            // Console.WriteLine("{0}:{1} - height: {2}", startFrom.X, startFrom.Y, startHeight);
-            // Console.WriteLine("  been to {0}", string.Join(",", visited));
-            Coords up;
-            Coords down;
-            Coords left;
-            Coords right;
-            List<Coords> candidates = new List<Coords>();
-            if (startFrom.Y > 0) {
-                up = new Coords(startFrom.X, startFrom.Y - 1);
-                // Console.WriteLine("  been to up({0}): {1}", up, visited.Contains(up.ToString()));
-                int diff = map[up.ToString()] - map[startFrom.ToString()];
-                // Console.WriteLine("  {0} is at most 1 higher than {1}: {2}", map[up.ToString()], map[startFrom.ToString()], diff <= 1);
-                if (!visited.Contains(up.ToString()) && diff <=1) {
-                    candidates.Add(up);
-                }
-            }
-            if (startFrom.Y < lastRow) {
-                down = new Coords(startFrom.X, startFrom.Y + 1);
-                // Console.WriteLine("  been to down({0}): {1}", down, visited.Contains(down.ToString()));
-                int diff = map[down.ToString()] - map[startFrom.ToString()];
-                // Console.WriteLine("  {0} is at most 1 higher than {1}: {2}", map[down.ToString()], map[startFrom.ToString()], diff <= 1);
-                if (!visited.Contains(down.ToString()) && diff <=1) {
-                    candidates.Add(down);
-                }
-            }
-            if (startFrom.X > 0) {
-                left = new Coords(startFrom.X - 1, startFrom.Y);
-                // Console.WriteLine("  been to left({0}): {1}", left, visited.Contains(left.ToString()));
-                int diff = map[left.ToString()] - map[startFrom.ToString()];
-                // Console.WriteLine("  {0} is at most 1 higher than {1}: {2}", map[left.ToString()], map[startFrom.ToString()], diff <= 1);
-                if (!visited.Contains(left.ToString()) && diff <=1) {
-                    candidates.Add(left);
-                }
-            }
-            if (startFrom.X < lastCol) {
-                right = new Coords(startFrom.X + 1, startFrom.Y);
-                // Console.WriteLine("  been to right({0}): {1}", right, visited.Contains(right.ToString()));
-                int diff = map[right.ToString()] - map[startFrom.ToString()];
-                // Console.WriteLine("  {0} is at most 1 higher than {1}: {2}", map[right.ToString()], map[startFrom.ToString()], diff <= 1);
-                if (!visited.Contains(right.ToString()) && diff <=1) {
-                    candidates.Add(right);
-                }
-            }
-            // Console.WriteLine(" ");
-            // foreach(Coords candidate in candidates) {
-                // Console.WriteLine("From {0} could go next to {1}", startFrom, candidate.ToString());
-            // }
-            // Console.WriteLine(" ");
-            foreach(Coords candidate in candidates) {
-                List<string> newVisited = new List<string>(visited);
-                searchPath(candidate, newVisited);
-            }
-        }
-
         static void PartOne()
-        {
-            // string input = System.IO.File.ReadAllText(@"test.txt");
-            string input = System.IO.File.ReadAllText(@"input.txt");
-            // Console.WriteLine("Input:\n{0}", input);
-            // Console.WriteLine("===========");
-            using (StringReader reader = new StringReader(input))
-            {
-                int rowIndex = 0;
-                string? legendRow = String.Empty;
-                do {
-                    legendRow = reader.ReadLine();
-                    if (legendRow != null) {
-                        char[] positions = legendRow.ToCharArray();
-                        int colIndex = 0;
-                        foreach (char position in positions) {
-                            int height = 0;
-                            switch (position) {
-                                case 'S':
-                                    startPosition = new Coords(colIndex, rowIndex);
-                                    height = 0;
-                                    break;
-                                case 'E':
-                                    finishPosition = new Coords(colIndex, rowIndex);
-                                    height = 26;
-                                    break;
-                                default :
-                                    height = (int)position - 97;
-                                    break;
-                            }
-                            string address = "" + colIndex + ":" + rowIndex;
-                            map[address] = height;
-                            Console.WriteLine("{0} - {1}", address, height);
-                            colIndex++;
-                        }
-                        lastCol = colIndex - 1;
-                    }
-                    rowIndex++;
-                } while (legendRow != null);
-                lastRow = rowIndex - 2;
-            }
-            List<string> visited = new List<string>();
-            Console.WriteLine("Starting search. Last col: {0}, last row: {1}, startPosition: {2}, finishPosition: {3}", lastCol, lastRow, startPosition, finishPosition);
-            searchPath(startPosition, visited);
-        }
-
-        static void PartTwo()
         {
             string input = System.IO.File.ReadAllText(@"test.txt");
             // string input = System.IO.File.ReadAllText(@"input.txt");
             Console.WriteLine("Input:\n{0}", input);
             Console.WriteLine("===========");
+            string[] line;
+            Map map = new Map();
+            Queue<Square> queue = new();
+            {
+                line = input.Split("\n");
+
+                for (int i = 0; i < line.Count(); i++)
+                {
+                    List<Square> y = new();
+                    for (int j = 0; j < line[i].Length; j++)
+                    {
+                        Square square = new Square();
+                        square.id = line[i][j];
+                        square.x = j;
+                        square.y = i;
+                        square.distance = null;
+                        switch (square.id) {
+                            case 'S':
+                                square.height = 0;
+                                break;
+                            case 'E':
+                                square.height = 25;
+                                break;
+                            default:
+                                square.height = (int)square.id - 97;
+                                square.distance = 0;
+                                queue.Enqueue(square);
+                                break;
+                        }
+                        y.Add(square);
+                    }
+                    map.Rows.Add(y);
+                }
+            }
+
+            Square Part1 = new Square();
+            List<Square> Part2 = new List<Square>();
+            while (queue.Count > 0)
+            {
+                Square square = queue.Dequeue();
+                AssignDistances(square.x, square.y, (int)square.distance, square.height);
+                if (square.id == 'S') { Part1 = square; }
+                if (square.id == 'a') { Part2.Add(square); }
+            }
+            Console.WriteLine($"Part 1: {Part1.distance}");
+            Part2 = Part2.OrderBy(x => x.distance).ToList();
+            Console.WriteLine($"Part 2: {Part2[0].distance}");
+
+            void AssignDistances(int x, int y, int d, int h)
+            {
+                //LEFT
+
+                if (x > 0 && map.Rows[y][x - 1].height <= h + 1)
+                {
+                    if (map.Rows[y][x - 1].distance == null)
+                    {
+                        map.Rows[y][x - 1].distance = d + 1;
+                        queue.Enqueue(map.Rows[y][x - 1]);
+                    }
+                    else if (map.Rows[y][x - 1].distance > d + 1)
+                    {
+                        map.Rows[y][x - 1].distance = d + 1;
+                        queue.Enqueue(map.Rows[y][x - 1]);
+                    }
+                }
+
+                //RIGHT
+                if (x + 2 <= line[0].Length && map.Rows[y][x + 1].height <= h + 1)
+                {
+                    if (map.Rows[y][x + 1].distance == null)
+                    {
+                        map.Rows[y][x + 1].distance = d + 1;
+                        queue.Enqueue(map.Rows[y][x + 1]);
+                    }
+                    else if (map.Rows[y][x + 1].distance > d + 1)
+                    {
+                        map.Rows[y][x + 1].distance = d + 1;
+                        queue.Enqueue(map.Rows[y][x + 1]);
+                    }
+                }
+
+                //UP
+                if (y > 0 && map.Rows[y - 1][x].height <= h + 1)
+                {
+                    if (map.Rows[y - 1][x].distance == null)
+                    {
+                        map.Rows[y - 1][x].distance = d + 1;
+                        queue.Enqueue(map.Rows[y - 1][x]);
+                    }
+                    else if (map.Rows[y - 1][x].distance > d + 1)
+                    {
+                        map.Rows[y - 1][x].distance = d + 1;
+                        queue.Enqueue(map.Rows[y - 1][x]);
+                    }
+                }
+
+                //DOWN
+                if (y + 2 <= line.Length && map.Rows[y + 1][x].height <= h + 1)
+                {
+                    if (map.Rows[y + 1][x].distance == null)
+                    {
+                        map.Rows[y + 1][x].distance = d + 1;
+                        queue.Enqueue(map.Rows[y + 1][x]);
+                    }
+                    else if (map.Rows[y + 1][x].distance > d + 1)
+                    {
+                        map.Rows[y + 1][x].distance = d + 1;
+                        queue.Enqueue(map.Rows[y + 1][x]);
+                    }
+                }
+            }
         }
     }
 }
+
