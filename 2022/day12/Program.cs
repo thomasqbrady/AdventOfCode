@@ -21,11 +21,77 @@ namespace com.thomasqbrady
 
     class Day12
     {
+        private static Map map = new Map();
+        private static Queue<Square> queue = new();
 
         static void Main()
         {
             PartOne();
             // PartTwo();
+        }
+
+        static void AssignDistances(int x, int y, int? d, int h)
+        {
+            //LEFT
+
+            if (x > 0 && map.Rows[y][x - 1].height <= h + 1)
+            {
+                if (map.Rows[y][x - 1].distance == null)
+                {
+                    map.Rows[y][x - 1].distance = d + 1;
+                    queue.Enqueue(map.Rows[y][x - 1]);
+                }
+                else if (map.Rows[y][x - 1].distance > d + 1)
+                {
+                    map.Rows[y][x - 1].distance = d + 1;
+                    queue.Enqueue(map.Rows[y][x - 1]);
+                }
+            }
+
+            //RIGHT
+            if (x + 2 <= map.Columns.Count && map.Rows[y][x + 1].height <= h + 1)
+            {
+                if (map.Rows[y][x + 1].distance == null)
+                {
+                    map.Rows[y][x + 1].distance = d + 1;
+                    queue.Enqueue(map.Rows[y][x + 1]);
+                }
+                else if (map.Rows[y][x + 1].distance > d + 1)
+                {
+                    map.Rows[y][x + 1].distance = d + 1;
+                    queue.Enqueue(map.Rows[y][x + 1]);
+                }
+            }
+
+            //UP
+            if (y > 0 && map.Rows[y - 1][x].height <= h + 1)
+            {
+                if (map.Rows[y - 1][x].distance == null)
+                {
+                    map.Rows[y - 1][x].distance = d + 1;
+                    queue.Enqueue(map.Rows[y - 1][x]);
+                }
+                else if (map.Rows[y - 1][x].distance > d + 1)
+                {
+                    map.Rows[y - 1][x].distance = d + 1;
+                    queue.Enqueue(map.Rows[y - 1][x]);
+                }
+            }
+
+            //DOWN
+            if (y + 2 <= map.Rows.Count && map.Rows[y + 1][x].height <= h + 1)
+            {
+                if (map.Rows[y + 1][x].distance == null)
+                {
+                    map.Rows[y + 1][x].distance = d + 1;
+                    queue.Enqueue(map.Rows[y + 1][x]);
+                }
+                else if (map.Rows[y + 1][x].distance > d + 1)
+                {
+                    map.Rows[y + 1][x].distance = d + 1;
+                    queue.Enqueue(map.Rows[y + 1][x]);
+                }
+            }
         }
 
         static void PartOne()
@@ -35,8 +101,6 @@ namespace com.thomasqbrady
             Console.WriteLine("Input:\n{0}", input);
             Console.WriteLine("===========");
             string[] line;
-            Map map = new Map();
-            Queue<Square> queue = new();
             {
                 line = input.Split("\n");
 
@@ -59,7 +123,7 @@ namespace com.thomasqbrady
                                 break;
                             default:
                                 square.height = (int)square.id - 97;
-                                square.distance = 0;
+                                square.distance = null;
                                 queue.Enqueue(square);
                                 break;
                         }
@@ -74,7 +138,7 @@ namespace com.thomasqbrady
             while (queue.Count > 0)
             {
                 Square square = queue.Dequeue();
-                AssignDistances(square.x, square.y, (int)square.distance, square.height);
+                AssignDistances(square.x, square.y, square.distance, square.height);
                 if (square.id == 'S') { Part1 = square; }
                 if (square.id == 'a') { Part2.Add(square); }
             }
@@ -82,69 +146,6 @@ namespace com.thomasqbrady
             Part2 = Part2.OrderBy(x => x.distance).ToList();
             Console.WriteLine($"Part 2: {Part2[0].distance}");
 
-            void AssignDistances(int x, int y, int d, int h)
-            {
-                //LEFT
-
-                if (x > 0 && map.Rows[y][x - 1].height <= h + 1)
-                {
-                    if (map.Rows[y][x - 1].distance == null)
-                    {
-                        map.Rows[y][x - 1].distance = d + 1;
-                        queue.Enqueue(map.Rows[y][x - 1]);
-                    }
-                    else if (map.Rows[y][x - 1].distance > d + 1)
-                    {
-                        map.Rows[y][x - 1].distance = d + 1;
-                        queue.Enqueue(map.Rows[y][x - 1]);
-                    }
-                }
-
-                //RIGHT
-                if (x + 2 <= line[0].Length && map.Rows[y][x + 1].height <= h + 1)
-                {
-                    if (map.Rows[y][x + 1].distance == null)
-                    {
-                        map.Rows[y][x + 1].distance = d + 1;
-                        queue.Enqueue(map.Rows[y][x + 1]);
-                    }
-                    else if (map.Rows[y][x + 1].distance > d + 1)
-                    {
-                        map.Rows[y][x + 1].distance = d + 1;
-                        queue.Enqueue(map.Rows[y][x + 1]);
-                    }
-                }
-
-                //UP
-                if (y > 0 && map.Rows[y - 1][x].height <= h + 1)
-                {
-                    if (map.Rows[y - 1][x].distance == null)
-                    {
-                        map.Rows[y - 1][x].distance = d + 1;
-                        queue.Enqueue(map.Rows[y - 1][x]);
-                    }
-                    else if (map.Rows[y - 1][x].distance > d + 1)
-                    {
-                        map.Rows[y - 1][x].distance = d + 1;
-                        queue.Enqueue(map.Rows[y - 1][x]);
-                    }
-                }
-
-                //DOWN
-                if (y + 2 <= line.Length && map.Rows[y + 1][x].height <= h + 1)
-                {
-                    if (map.Rows[y + 1][x].distance == null)
-                    {
-                        map.Rows[y + 1][x].distance = d + 1;
-                        queue.Enqueue(map.Rows[y + 1][x]);
-                    }
-                    else if (map.Rows[y + 1][x].distance > d + 1)
-                    {
-                        map.Rows[y + 1][x].distance = d + 1;
-                        queue.Enqueue(map.Rows[y + 1][x]);
-                    }
-                }
-            }
         }
     }
 }
