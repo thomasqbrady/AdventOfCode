@@ -4,148 +4,97 @@
 
 namespace com.thomasqbrady
 {
-    public class Square
-    {
-        public char id;
-        public int x;
-        public int y;
-        public int height;
-        public int? distance;
-    }
-
-    public class Map
-    {
-        public List<Square> Columns = new();
-        public List<List<Square>> Rows = new();
-    }
-
     class Day12
     {
-        private static Map map = new Map();
-        private static Queue<Square> queue = new();
+        private static char[,] map = new char[0,0];
+        private static int[,] distances = new int[0,0];
+        private static List<(int, int)> lowestStarts = new List<(int, int)>();
+        private static int width, height, startX, startY, endX, endY, generation;
 
         static void Main()
         {
-            PartOne();
-            // PartTwo();
+            // string input = System.IO.File.ReadAllText(@"test.txt");
+            string input = System.IO.File.ReadAllText(@"input.txt");
+            // Console.WriteLine("Input:\n{0}", input);
+            // Console.WriteLine("===========");
+            string[] lines = input.Split("\n");
+            parse(lines);
+            Console.WriteLine("MAP");
+            width = lines[0].Length;
+            height= lines.Length;
+            for (int y = 0;y < height;y++) {
+                for (int x = 0;x < width;x++) {
+                    Console.Write("{0} ", map[x, y]);
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine("===========");
+            Console.WriteLine("DISTANCE");
+            for (int y = 0;y < height;y++) {
+                for (int x = 0;x < width;x++) {
+                    Console.Write("{0} ", distances[x, y]);
+                }
+                Console.WriteLine();
+            }
+            // PartOne();
+            PartTwo();
         }
 
-        static void AssignDistances(int x, int y, int? d, int h)
-        {
-            //LEFT
-
-            if (x > 0 && map.Rows[y][x - 1].height <= h + 1)
-            {
-                if (map.Rows[y][x - 1].distance == null)
-                {
-                    map.Rows[y][x - 1].distance = d + 1;
-                    queue.Enqueue(map.Rows[y][x - 1]);
-                }
-                else if (map.Rows[y][x - 1].distance > d + 1)
-                {
-                    map.Rows[y][x - 1].distance = d + 1;
-                    queue.Enqueue(map.Rows[y][x - 1]);
+        static void parse(string[] input) {
+            width = input[0].Length;
+            height= input.Length;
+            map = new char[width, height];
+            distances = new int[width, height];
+            for (int y = 0;y < height;y++) {
+                for (int x = 0;x < width;x++) {
+                    map[x, y] = input[y][x];
+                    distances[x, y] = 0;
+                    if (map[x, y] == 'S') { startX = x; startY = y; map[x, y] = 'a';}
+                    if (map[x, y] == 'E') { endX = x; endY = y; map[x, y] = 'z';}
+                    if (map[x, y] == 'a') { lowestStarts.Add((x, y)); }
                 }
             }
+        }
 
-            //RIGHT
-            if (x + 2 <= map.Columns.Count && map.Rows[y][x + 1].height <= h + 1)
-            {
-                if (map.Rows[y][x + 1].distance == null)
-                {
-                    map.Rows[y][x + 1].distance = d + 1;
-                    queue.Enqueue(map.Rows[y][x + 1]);
+        static int bfs(List<(int, int)> start) {
+            List<(int, int)> stack = start;
+            List<(int, int)> directions = new List<(int, int)> { (-1, 0), (1, 0), (0, -1), (0, 1) };
+            generation += 10000;
+            int distance = ++generation;
+            Console.WriteLine("distance: {0} generation {1}", distance, generation);
+            foreach ((int sx, int sy) in start) distances[sx, sy] = distance;
+            while (stack.Count > 0) {
+                List<(int, int)> next = new List<(int, int)>();
+                distance++;
+                foreach ((int candidateX, int candidateY) in stack) {
+                    foreach ((int dx, int dy) in directions) {
+                        int nextX = candidateX + dx, nextY = candidateY + dy;
+                        if (nextX >= 0 && nextX < width && nextY >= 0 && nextY < height) {
+                            if (distances[nextX, nextY] < generation && map[nextX, nextY] <= map[candidateX, candidateY] + 1) {
+                                if ((nextX, nextY) == (endX, endY)) return distance - generation;
+                                Console.WriteLine("distance: {0} generation: {1}", distance, generation);
+                                distances[nextX, nextY] = distance;
+                                next.Add((nextX, nextY));
+                            }
+                        }
+                    }
                 }
-                else if (map.Rows[y][x + 1].distance > d + 1)
-                {
-                    map.Rows[y][x + 1].distance = d + 1;
-                    queue.Enqueue(map.Rows[y][x + 1]);
-                }
+                stack = next;
             }
-
-            //UP
-            if (y > 0 && map.Rows[y - 1][x].height <= h + 1)
-            {
-                if (map.Rows[y - 1][x].distance == null)
-                {
-                    map.Rows[y - 1][x].distance = d + 1;
-                    queue.Enqueue(map.Rows[y - 1][x]);
-                }
-                else if (map.Rows[y - 1][x].distance > d + 1)
-                {
-                    map.Rows[y - 1][x].distance = d + 1;
-                    queue.Enqueue(map.Rows[y - 1][x]);
-                }
-            }
-
-            //DOWN
-            if (y + 2 <= map.Rows.Count && map.Rows[y + 1][x].height <= h + 1)
-            {
-                if (map.Rows[y + 1][x].distance == null)
-                {
-                    map.Rows[y + 1][x].distance = d + 1;
-                    queue.Enqueue(map.Rows[y + 1][x]);
-                }
-                else if (map.Rows[y + 1][x].distance > d + 1)
-                {
-                    map.Rows[y + 1][x].distance = d + 1;
-                    queue.Enqueue(map.Rows[y + 1][x]);
-                }
-            }
+            return -1;
         }
 
         static void PartOne()
         {
-            string input = System.IO.File.ReadAllText(@"test.txt");
-            // string input = System.IO.File.ReadAllText(@"input.txt");
-            Console.WriteLine("Input:\n{0}", input);
-            Console.WriteLine("===========");
-            string[] line;
-            {
-                line = input.Split("\n");
+            // Console.WriteLine("===========");
+            Console.WriteLine("Part one");
+            Console.WriteLine(bfs(new List<(int, int)> {(startX, startY)}).ToString());
+        }
 
-                for (int i = 0; i < line.Count(); i++)
-                {
-                    List<Square> y = new();
-                    for (int j = 0; j < line[i].Length; j++)
-                    {
-                        Square square = new Square();
-                        square.id = line[i][j];
-                        square.x = j;
-                        square.y = i;
-                        square.distance = null;
-                        switch (square.id) {
-                            case 'S':
-                                square.height = 0;
-                                break;
-                            case 'E':
-                                square.height = 25;
-                                break;
-                            default:
-                                square.height = (int)square.id - 97;
-                                square.distance = null;
-                                queue.Enqueue(square);
-                                break;
-                        }
-                        y.Add(square);
-                    }
-                    map.Rows.Add(y);
-                }
-            }
-
-            Square Part1 = new Square();
-            List<Square> Part2 = new List<Square>();
-            while (queue.Count > 0)
-            {
-                Square square = queue.Dequeue();
-                AssignDistances(square.x, square.y, square.distance, square.height);
-                if (square.id == 'S') { Part1 = square; }
-                if (square.id == 'a') { Part2.Add(square); }
-            }
-            Console.WriteLine($"Part 1: {Part1.distance}");
-            Part2 = Part2.OrderBy(x => x.distance).ToList();
-            Console.WriteLine($"Part 2: {Part2[0].distance}");
-
+        static void PartTwo() {
+            // Console.WriteLine("===========");``
+            Console.WriteLine("Part one");
+            Console.WriteLine(bfs(lowestStarts).ToString());
         }
     }
 }
