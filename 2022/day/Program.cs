@@ -1,11 +1,16 @@
 ﻿/** author: Thomas Q Brady
 *** Advent of Code 2022 day 1
 **/
+using System.Text.Json;
 
 namespace com.thomasqbrady
 {
     class Day
     {
+        static void LogObject(object o) {
+            Console.WriteLine(JsonSerializer.Serialize(o));
+        }
+
         static void Main()
         {
             string input = System.IO.File.ReadAllText(@"test.txt");
