@@ -1,5 +1,5 @@
 ﻿/** author: Thomas Q Brady
-*** Advent of Code 2022 day 1
+*** Advent of Code 2022 day 13
 **/
 using System.Text.Json;
 
@@ -11,7 +11,7 @@ namespace com.thomasqbrady
         }
     }
 
-    class Day
+    class Day13
     {
         static void Main()
         {

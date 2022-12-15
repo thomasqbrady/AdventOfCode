@@ -1,5 +1,5 @@
 ﻿/** author: Thomas Q Brady
-*** Advent of Code 2022 day 1
+*** Advent of Code 2022 day 4
 **/
 
 namespace com.thomasqbrady

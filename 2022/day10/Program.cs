@@ -1,10 +1,10 @@
 ﻿/** author: Thomas Q Brady
-*** Advent of Code 2022 day 1
+*** Advent of Code 2022 day 10
 **/
 
 namespace com.thomasqbrady
 {
-    class Day
+    class Day10
     {
         private static int x = 1;
         private static int cycleIndex = 0;

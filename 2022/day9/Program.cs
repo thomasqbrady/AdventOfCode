@@ -1,5 +1,5 @@
 ﻿/** author: Thomas Q Brady
-*** Advent of Code 2022 day 1
+*** Advent of Code 2022 day 9
 **/
 
 namespace com.thomasqbrady
@@ -15,7 +15,7 @@ namespace com.thomasqbrady
 
         public override string ToString() => $"{X}:{Y}";
     }
-    class Day
+    class Day9
     {
         static void Main()
         {

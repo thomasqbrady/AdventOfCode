@@ -1,10 +1,10 @@
 ﻿/** author: Thomas Q Brady
-*** Advent of Code 2022 day 1
+*** Advent of Code 2022 day 8
 **/
 
 namespace com.thomasqbrady
 {
-    class Day7
+    class Day8
     {
         static void Main()
         {

@@ -1,5 +1,5 @@
 ﻿/** author: Thomas Q Brady
-*** Advent of Code 2022 day 1
+*** Advent of Code 2022 day 11
 **/
 
 namespace com.thomasqbrady
@@ -87,7 +87,7 @@ namespace com.thomasqbrady
 
     }
 
-    class Day
+    class Day11
     {
         private static IDictionary<int, Monkey> monkeys = new Dictionary<int, Monkey>();
         static void Main()

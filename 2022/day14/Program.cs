@@ -1,11 +1,11 @@
 ﻿/** author: Thomas Q Brady
-*** Advent of Code 2022 day 1
+*** Advent of Code 2022 day 14
 **/
 using System.Text.Json;
 
 namespace com.thomasqbrady
 {
-    class Day
+    class Day14
     {
         static void LogObject(object o) {
             Console.WriteLine(JsonSerializer.Serialize(o));
