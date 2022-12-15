@@ -17,14 +17,14 @@ namespace com.thomasqbrady
             // string input = System.IO.File.ReadAllText(@"input.txt");
             Console.WriteLine("Input:\n{0}", input);
             Console.WriteLine("===========");
-            PartOne();
-            // PartTwo();
+            PartOne(input);
+            // PartTwo(input);
         }
-        static void PartOne()
+        static void PartOne(string input)
         {
         }
 
-        static void PartTwo()
+        static void PartTwo(string input)
         {
         }
     }
