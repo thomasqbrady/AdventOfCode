@@ -157,9 +157,72 @@ namespace com.thomasqbrady
             Console.WriteLine("safe positions: {0}", checkRow(rowToCheck));
         }
 
+        static List<(Int64, Int64)> walkPerimeter(Int64 x, Int64 y, Int64 radius, List<(Int64, Int64, Int64)> sensors) {
+            List<(Int64, Int64)> candidates = new List<(Int64, Int64)>();
+            Console.WriteLine("drawing sensor radius from {0}:{1} for {2}", x, y, radius);
+            for (Int64 row = y - radius;row <= y + radius;row++) {
+                Console.WriteLine("drawing sensor radius from {0}:{1} for {2}", x, y, radius);
+                Console.WriteLine($"Abs(Abs({y}-{row})-{radius}) = {Math.Abs((y - row) - radius)}");
+                Int64 xTravel = Math.Abs(Math.Abs(y - row) - radius);
+                Console.WriteLine("row {0} xTravel: {1}", row, xTravel);
+                for (Int64 col = x - xTravel;col <= x + xTravel;col++) {
+                    if (!map.ContainsKey($"{col}:{row}") && col > leftWall && col < rightWall && row > topWall && row < bottomWall) {
+                        bool outsideAll = true;
+                        foreach ((Int64, Int64, Int64) sensor in sensors) {
+]                            if (Math.Abs(col - sensor.Item1) + Math.Abs(row = sensor.Item2) > sensor.Item3) {
+                                outsideAll = false;
+                            }
+                        }
+                        if (outsideAll) {
+                            candidates.Add((col, row));
+                        }
+                    }
+                }
+            }
+            return candidates;
+        }
+
         static void PartTwo(string input)
         {
-            //walk along the edge of the diamonds created by the sensors and for every of these positions, check if it is within range of any of the sensors. If not, we have found the result
+            //walk along the edge of the diamonds created by the sensors and for every of these positions, 
+            // check if it is within range of any of the sensors. If not, we have found the result
+             int rowToCheck = 2000000;
+            List<(Int64, Int64, Int64)> sensors = new List<(Int64, Int64, Int64)>();
+            List<(Int64, Int64)> candidates = new List<(Int64, Int64)>();
+            string[] readouts = input.Split("\n");
+            foreach (string readout in readouts) {
+                string[] readoutParts = readout.Split(":");
+                string sensorReadout = readoutParts[0];
+                string beaconReadout = readoutParts[1];
+                (Int64, Int64) sensorCoords = parseDevice(sensorReadout, "sensor");
+                (Int64, Int64) beaconCoords = parseDevice(beaconReadout, "beacon");
+                Int64 sX = sensorCoords.Item1;
+                Int64 sY = sensorCoords.Item2;
+                Int64 bX = beaconCoords.Item1;
+                Int64 bY = beaconCoords.Item2;
+                // Console.WriteLine("Sensor {0}:{1} closest beacon is {2}:{3}", sX, sY, bX, bY);
+                Int64 manhattanDistance = Math.Abs(bX - sX) + Math.Abs(bY - sY);
+                topWall = (topWall > sY - manhattanDistance) ? sY - manhattanDistance : topWall;
+                rightWall = (rightWall < sX + manhattanDistance) ? sX + manhattanDistance : rightWall;
+                bottomWall = (bottomWall < sY + manhattanDistance) ? sY + manhattanDistance : bottomWall;
+                leftWall = (leftWall > sX - manhattanDistance) ? sX - manhattanDistance : leftWall;
+                // Console.WriteLine("Manhattan distance: {0}", manhattanDistance);
+                sensors.Add((sX, sY, manhattanDistance));
+            }
+            // LogObject(map);
+            // printMap();
+            foreach ((Int64, Int64, Int64) sensor in sensors) {
+                Int64 sX = sensor.Item1;
+                Int64 sY = sensor.Item2;
+                Int64 mD = sensor.Item3;
+                candidates = walkPerimeter(sX, sY, mD + 1, sensors);
+            }
+            // printMap();
+            // printMapRow(rowToCheck);
+            // Console.WriteLine("safe positions: {0}", checkRow(rowToCheck));
+            foreach ((Int64, Int64) candidate in candidates) {
+                Console.WriteLine("Could be {0}:{1}", candidate.Item1, candidate.Item2);
+            }
         }
     }
 }
