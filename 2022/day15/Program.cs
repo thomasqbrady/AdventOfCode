@@ -159,21 +159,27 @@ namespace com.thomasqbrady
 
         static List<(Int64, Int64)> walkPerimeter(Int64 x, Int64 y, Int64 radius, List<(Int64, Int64, Int64)> sensors) {
             List<(Int64, Int64)> candidates = new List<(Int64, Int64)>();
-            Console.WriteLine("drawing sensor radius from {0}:{1} for {2}", x, y, radius);
+            Console.WriteLine("walking perimeter from {0}:{1} for {2}", x, y, radius);
             for (Int64 row = y - radius;row <= y + radius;row++) {
-                Console.WriteLine("drawing sensor radius from {0}:{1} for {2}", x, y, radius);
-                Console.WriteLine($"Abs(Abs({y}-{row})-{radius}) = {Math.Abs((y - row) - radius)}");
                 Int64 xTravel = Math.Abs(Math.Abs(y - row) - radius);
-                Console.WriteLine("row {0} xTravel: {1}", row, xTravel);
-                for (Int64 col = x - xTravel;col <= x + xTravel;col++) {
-                    if (!map.ContainsKey($"{col}:{row}") && col > leftWall && col < rightWall && row > topWall && row < bottomWall) {
+                for (Int64 col = x - xTravel;col <= x + xTravel;col += (xTravel > 0) ? xTravel * 2 : 1) {
+                    Console.WriteLine($"checking {col}:{row} xTravel: {xTravel} {col <= x + xTravel}");
+                    if (!map.ContainsKey($"{col}:{row}") && col >= leftWall && col <= rightWall && row >= topWall && row <= bottomWall) {
                         bool outsideAll = true;
                         foreach ((Int64, Int64, Int64) sensor in sensors) {
-]                            if (Math.Abs(col - sensor.Item1) + Math.Abs(row = sensor.Item2) > sensor.Item3) {
-                                outsideAll = false;
+                            if (sensor.Item1 != x && sensor.Item2 != y) {
+                                if (Math.Abs(col - sensor.Item1) + Math.Abs(row - sensor.Item2) <= sensor.Item3) {
+                                    outsideAll = false;
+                                    // Console.WriteLine($"{col}:{row} is on the perimeter of {x}:{y}({_radius}) but is within range of {sensor.Item1}:{sensor.Item2}({sensor.Item3})");
+                                    break;
+                                } else {
+                                    // Console.WriteLine($"{col}:{row} is on the perimeter of {x}:{y}({_radius}) and is NOT within range of {sensor.Item1}:{sensor.Item2}({sensor.Item3})");
+                                }
                             }
                         }
                         if (outsideAll) {
+                            Console.WriteLine($"{col}:{row} is a candidate");
+                            map[$"{col}:{row}"] = "C";
                             candidates.Add((col, row));
                         }
                     }
@@ -208,16 +214,19 @@ namespace com.thomasqbrady
                 leftWall = (leftWall > sX - manhattanDistance) ? sX - manhattanDistance : leftWall;
                 // Console.WriteLine("Manhattan distance: {0}", manhattanDistance);
                 sensors.Add((sX, sY, manhattanDistance));
+                drawSensorRadius(sX, sY, manhattanDistance);
             }
             // LogObject(map);
             // printMap();
+            // (Int64, Int64, Int64) sensor = sensors[0];
+            // walkPerimeter(sensor.Item1, sensor.Item2, sensor.Item3, sensors);
             foreach ((Int64, Int64, Int64) sensor in sensors) {
                 Int64 sX = sensor.Item1;
                 Int64 sY = sensor.Item2;
                 Int64 mD = sensor.Item3;
                 candidates = walkPerimeter(sX, sY, mD + 1, sensors);
             }
-            // printMap();
+            printMap();
             // printMapRow(rowToCheck);
             // Console.WriteLine("safe positions: {0}", checkRow(rowToCheck));
             foreach ((Int64, Int64) candidate in candidates) {
