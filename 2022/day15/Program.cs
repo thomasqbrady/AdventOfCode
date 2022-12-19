@@ -192,7 +192,6 @@ namespace com.thomasqbrady
         {
             //walk along the edge of the diamonds created by the sensors and for every of these positions, 
             // check if it is within range of any of the sensors. If not, we have found the result
-             int rowToCheck = 2000000;
             List<(Int64, Int64, Int64)> sensors = new List<(Int64, Int64, Int64)>();
             List<(Int64, Int64)> candidates = new List<(Int64, Int64)>();
             string[] readouts = input.Split("\n");
@@ -213,8 +212,10 @@ namespace com.thomasqbrady
                 bottomWall = (bottomWall < sY + manhattanDistance) ? sY + manhattanDistance : bottomWall;
                 leftWall = (leftWall > sX - manhattanDistance) ? sX - manhattanDistance : leftWall;
                 // Console.WriteLine("Manhattan distance: {0}", manhattanDistance);
-                sensors.Add((sX, sY, manhattanDistance));
-                drawSensorRadius(sX, sY, manhattanDistance);
+                if (sX >= 0 && sX <= 4000000 && sY >= 0 && sY <= 4000000) {
+                    sensors.Add((sX, sY, manhattanDistance));
+                    // drawSensorRadius(sX, sY, manhattanDistance);
+                }
             }
             // LogObject(map);
             // printMap();
@@ -224,7 +225,27 @@ namespace com.thomasqbrady
                 Int64 sX = sensor.Item1;
                 Int64 sY = sensor.Item2;
                 Int64 mD = sensor.Item3;
-                candidates = walkPerimeter(sX, sY, mD + 1, sensors);
+                List<(Int64, Int64)> cand = walkPerimeter(sX, sY, mD + 1, sensors);
+                foreach((Int64, Int64) position in cand) {
+                    // see if the positions up, right, down, and left are all within range of another sensor...
+                    bool insideAll = true;
+                    foreach ((Int64, Int64, Int64) sensor in sensors) {
+                        if (sensor.Item1 != x && sensor.Item2 != y) {
+                            if (Math.Abs(col - sensor.Item1) + Math.Abs(row - sensor.Item2) <= sensor.Item3) {
+                                outsideAll = false;
+                                // Console.WriteLine($"{col}:{row} is on the perimeter of {x}:{y}({_radius}) but is within range of {sensor.Item1}:{sensor.Item2}({sensor.Item3})");
+                                break;
+                            } else {
+                                // Console.WriteLine($"{col}:{row} is on the perimeter of {x}:{y}({_radius}) and is NOT within range of {sensor.Item1}:{sensor.Item2}({sensor.Item3})");
+                            }
+                        }
+                    }
+                    if (outsideAll) {
+                        Console.WriteLine($"{col}:{row} is a candidate");
+                        map[$"{col}:{row}"] = "C";
+                        candidates.Add((col, row));
+                    }
+                }
             }
             printMap();
             // printMapRow(rowToCheck);
