@@ -12,6 +12,9 @@ namespace com.thomasqbrady
         private static Int64 rightWall = 0;
         private static Int64 bottomWall = 0;
         private static Int64 leftWall = 0;
+        private static Int64 min = 0;
+        private static Int64 max = 4000000;
+
 
         static void LogObject(object o) {
             Console.WriteLine(JsonSerializer.Serialize(o));
@@ -19,10 +22,10 @@ namespace com.thomasqbrady
 
         static void Main()
         {
-            string input = System.IO.File.ReadAllText(@"test.txt");
-            // string input = System.IO.File.ReadAllText(@"input.txt");
-            Console.WriteLine("Input:\n{0}", input);
-            Console.WriteLine("===========");
+            // string input = System.IO.File.ReadAllText(@"test.txt");
+            string input = System.IO.File.ReadAllText(@"input.txt");
+            // Console.WriteLine("Input:\n{0}", input);
+            // Console.WriteLine("===========");
             // PartOne(input);
             PartTwo(input);
         }
@@ -159,30 +162,70 @@ namespace com.thomasqbrady
 
         static List<(Int64, Int64)> walkPerimeter(Int64 x, Int64 y, Int64 radius, List<(Int64, Int64, Int64)> sensors) {
             List<(Int64, Int64)> candidates = new List<(Int64, Int64)>();
-            Console.WriteLine("walking perimeter from {0}:{1} for {2}", x, y, radius);
+            // Console.WriteLine("walking perimeter from {0}:{1} for {2}", x, y, radius);
             for (Int64 row = y - radius;row <= y + radius;row++) {
                 Int64 xTravel = Math.Abs(Math.Abs(y - row) - radius);
                 for (Int64 col = x - xTravel;col <= x + xTravel;col += (xTravel > 0) ? xTravel * 2 : 1) {
-                    Console.WriteLine($"checking {col}:{row} xTravel: {xTravel} {col <= x + xTravel}");
-                    if (!map.ContainsKey($"{col}:{row}") && col >= leftWall && col <= rightWall && row >= topWall && row <= bottomWall) {
-                        bool outsideAll = true;
-                        foreach ((Int64, Int64, Int64) sensor in sensors) {
-                            if (sensor.Item1 != x && sensor.Item2 != y) {
-                                if (Math.Abs(col - sensor.Item1) + Math.Abs(row - sensor.Item2) <= sensor.Item3) {
-                                    outsideAll = false;
-                                    // Console.WriteLine($"{col}:{row} is on the perimeter of {x}:{y}({_radius}) but is within range of {sensor.Item1}:{sensor.Item2}({sensor.Item3})");
-                                    break;
-                                } else {
-                                    // Console.WriteLine($"{col}:{row} is on the perimeter of {x}:{y}({_radius}) and is NOT within range of {sensor.Item1}:{sensor.Item2}({sensor.Item3})");
-                                }
+                    if (col >= min && col <= max && row >= min && row <= max) {
+                        // Console.WriteLine($"checking {col}:{row} xTravel: {xTravel} {col <= x + xTravel}");
+                        if (!map.ContainsKey($"{col}:{row}") && col >= leftWall && col <= rightWall && row >= topWall && row <= bottomWall) {
+                            bool outsideAll = true;
+                            foreach ((Int64, Int64, Int64) sensor in sensors) {
+                                // if (sensor.Item1 != x && sensor.Item2 != y) {
+                                    if (Math.Abs(col - sensor.Item1) + Math.Abs(row - sensor.Item2) <= sensor.Item3) {
+                                        outsideAll = false;
+                                        // Console.WriteLine($"{col}:{row} is on the perimeter of {x}:{y}({_radius}) but is within range of {sensor.Item1}:{sensor.Item2}({sensor.Item3})");
+                                        break;
+                                    } else {
+                                        // Console.WriteLine($"{col}:{row} is on the perimeter of {x}:{y}({_radius}) and is NOT within range of {sensor.Item1}:{sensor.Item2}({sensor.Item3})");
+                                    }
+                                // }
+                            }
+                            if (outsideAll) {
+                                // Console.WriteLine($"{col}:{row} is a candidate");
+                                map[$"{col}:{row}"] = "C";
+                                candidates.Add((col, row));
                             }
                         }
-                        if (outsideAll) {
-                            Console.WriteLine($"{col}:{row} is a candidate");
-                            map[$"{col}:{row}"] = "C";
-                            candidates.Add((col, row));
+                    }
+                }
+            }
+            return candidates;
+        }
+
+        static List<(Int64, Int64)> findIslands(List<(Int64, Int64)> listToScan, List<(Int64, Int64, Int64)> sensors) {
+            List<(Int64, Int64)> candidates = new List<(Int64, Int64)>();
+            foreach ((Int64, Int64) position in listToScan) {
+                // Console.WriteLine($"Is {position.Item1}:{position.Item2} surrounded?");
+                List<(Int64, Int64)> directionToCheck = new List<(Int64, Int64)>();
+                directionToCheck.Add((position.Item1, position.Item2 - 1));
+                directionToCheck.Add((position.Item1 + 1, position.Item2));
+                directionToCheck.Add((position.Item1, position.Item2 + 1));
+                directionToCheck.Add((position.Item1 - 1, position.Item2));                
+                // want to not be in range of another sensor, or outside range of all of them
+                bool surrounded = true;
+                foreach((Int64, Int64) direction in directionToCheck) {
+                    // Console.WriteLine($"checking {direction.Item1}:{direction.Item2}");
+                    // Console.WriteLine($"has a sensor or beacon: {map.ContainsKey($"{direction.Item1}:{direction.Item2}")}");
+                    if (!map.ContainsKey($"{direction.Item1}:{direction.Item2}")) {
+                        bool isInRangeOfAnySensor = false;
+                        foreach ((Int64, Int64, Int64) sensor in sensors) {
+                            // if (sensor.Item1 != direction.Item1 && sensor.Item2 != direction.Item2) {
+                                if (Math.Abs(direction.Item1 - sensor.Item1) + Math.Abs(direction.Item2 - sensor.Item2) <= sensor.Item3) {
+                                    isInRangeOfAnySensor = true;
+                                }
+                            // }
+                        }
+                        // Console.WriteLine($"Is in range of any sensor: {isInRangeOfAnySensor}");
+                        if (!isInRangeOfAnySensor) {
+                            // Console.WriteLine($"{direction.Item1}:{direction.Item2} is not a thing");
+                            surrounded = false;
                         }
                     }
+                }
+                // Console.WriteLine($"Answer: {surrounded}");
+                if (surrounded) {
+                    candidates.Add(position);
                 }
             }
             return candidates;
@@ -212,7 +255,7 @@ namespace com.thomasqbrady
                 bottomWall = (bottomWall < sY + manhattanDistance) ? sY + manhattanDistance : bottomWall;
                 leftWall = (leftWall > sX - manhattanDistance) ? sX - manhattanDistance : leftWall;
                 // Console.WriteLine("Manhattan distance: {0}", manhattanDistance);
-                if (sX >= 0 && sX <= 4000000 && sY >= 0 && sY <= 4000000) {
+                if (sX >= min && sX <= max && sY >= min && sY <= max) {
                     sensors.Add((sX, sY, manhattanDistance));
                     // drawSensorRadius(sX, sY, manhattanDistance);
                 }
@@ -225,33 +268,21 @@ namespace com.thomasqbrady
                 Int64 sX = sensor.Item1;
                 Int64 sY = sensor.Item2;
                 Int64 mD = sensor.Item3;
-                List<(Int64, Int64)> cand = walkPerimeter(sX, sY, mD + 1, sensors);
-                foreach((Int64, Int64) position in cand) {
-                    // see if the positions up, right, down, and left are all within range of another sensor...
-                    bool insideAll = true;
-                    foreach ((Int64, Int64, Int64) sensor in sensors) {
-                        if (sensor.Item1 != x && sensor.Item2 != y) {
-                            if (Math.Abs(col - sensor.Item1) + Math.Abs(row - sensor.Item2) <= sensor.Item3) {
-                                outsideAll = false;
-                                // Console.WriteLine($"{col}:{row} is on the perimeter of {x}:{y}({_radius}) but is within range of {sensor.Item1}:{sensor.Item2}({sensor.Item3})");
-                                break;
-                            } else {
-                                // Console.WriteLine($"{col}:{row} is on the perimeter of {x}:{y}({_radius}) and is NOT within range of {sensor.Item1}:{sensor.Item2}({sensor.Item3})");
-                            }
-                        }
-                    }
-                    if (outsideAll) {
-                        Console.WriteLine($"{col}:{row} is a candidate");
-                        map[$"{col}:{row}"] = "C";
-                        candidates.Add((col, row));
-                    }
+                List<(Int64, Int64)> cands = walkPerimeter(sX, sY, mD + 1, sensors);
+                foreach((Int64, Int64) cand in cands) {
+                    candidates.Add(cand);
                 }
             }
-            printMap();
+
+            // printMap();
             // printMapRow(rowToCheck);
             // Console.WriteLine("safe positions: {0}", checkRow(rowToCheck));
-            foreach ((Int64, Int64) candidate in candidates) {
-                Console.WriteLine("Could be {0}:{1}", candidate.Item1, candidate.Item2);
+            // foreach ((Int64, Int64) candidate in candidates) {
+            //     Console.WriteLine("Could be {0}:{1}", candidate.Item1, candidate.Item2);
+            // }
+            List<(Int64, Int64)> finalCandidates = findIslands(candidates, sensors);
+            foreach ((Int64, Int64) candidate in finalCandidates) {
+                Console.WriteLine("Must be {0}:{1}", candidate.Item1, candidate.Item2);
             }
         }
     }
