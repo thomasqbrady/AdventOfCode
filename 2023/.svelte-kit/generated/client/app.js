@@ -9,7 +9,8 @@ export const nodes = [
 	() => import('./nodes/5'),
 	() => import('./nodes/6'),
 	() => import('./nodes/7'),
-	() => import('./nodes/8')
+	() => import('./nodes/8'),
+	() => import('./nodes/9')
 ];
 
 export const server_loads = [];
@@ -21,6 +22,7 @@ export const dictionary = {
 		"/day3": [6],
 		"/day4": [7],
 		"/day5": [8],
+		"/day6": [9],
 		"/day": [3]
 	};
 
