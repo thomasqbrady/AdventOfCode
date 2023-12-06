@@ -3,7 +3,7 @@
 
   let total = 0;
   let text = "";
-  let inputArray: Array<string>;
+  let inputArray: Array<string> = [];
 
   async function getInput() {
     const response = await fetch("day1/practice-part-one.txt");
@@ -14,7 +14,7 @@
 
   onMount(() => {
     getInput().then((inputText) => {
-      let inputArray = inputText.split("\n");
+      inputArray = inputText.split("\n");
       processInput(inputArray);
     });
   });
