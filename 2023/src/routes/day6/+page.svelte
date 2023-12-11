@@ -1,4 +1,17 @@
 <script lang="ts">
+  /**
+   * In getInput you'll find three nearly identical lines starting with const response =
+   * Use the one for the problem you're working on, which is eithe
+   *   * the part one practice data
+   *   * the part two practice data
+   *   * your input
+   *
+   * the onMount Svelte function will call getInput to import the input file and then
+   * pass it to processInput. There will be two processInput functions in this file,
+   * and one will be commented out. That will most likely be the part one method, and
+   * it should have a comment saying so. The other should have a comment labeling it
+   * part two.
+   */
   import { onMount } from "svelte";
 
   let total = 1;
@@ -48,14 +61,14 @@
 
   // Part Two
   function processInput(inputData: Array<string>) {
-    let raceTime = parseInt(inputData[0]
-      .split(":")[1]
-      .trim()
-      .replace(/\s+/g, ""), 10);
-    let raceDistance = parseInt(inputData[1]
-      .split(":")[1]
-      .trim()
-      .replace(/\s+/g, ""), 10);
+    let raceTime = parseInt(
+      inputData[0].split(":")[1].trim().replace(/\s+/g, ""),
+      10
+    );
+    let raceDistance = parseInt(
+      inputData[1].split(":")[1].trim().replace(/\s+/g, ""),
+      10
+    );
     console.log(raceTime, raceDistance);
     let waysToWin = 0;
     for (let holdTime = 1; holdTime < raceTime; holdTime++) {
