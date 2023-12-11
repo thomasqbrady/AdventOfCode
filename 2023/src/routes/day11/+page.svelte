@@ -47,6 +47,82 @@
   };
 
   // Part One
+  // function processInput(inputData: Array<string>) {
+  //   let rows: Array<Array<string>> = [];
+  //   let rowsToBeAddedIndices: Array<number> = [];
+  //   let colCount = 0;
+  //   let galaxyCoordinates: Array<Coordinate> = [];
+  //   inputData.map((row, index) => {
+  //     colCount = row.length;
+  //     let filteredRow = row.replace(/\./g, "");
+  //     if (filteredRow === "") {
+  //       rowsToBeAddedIndices.push(index);
+  //     }
+  //     rows.push(row.split(""));
+  //   });
+  //   let colsToBeAddedIndices: Array<number> = [];
+  //   for (let x = 0; x < colCount; x++) {
+  //     let foundGalaxy = false;
+  //     for (let y = 0; y < rows.length; y++) {
+  //       if (rows[y][x] === "#") {
+  //         galaxyCoordinates.push({ x: x, y: y });
+  //         foundGalaxy = true;
+  //       }
+  //     }
+  //     if (!foundGalaxy) {
+  //       colsToBeAddedIndices.push(x);
+  //     }
+  //   }
+  //   colCount += colsToBeAddedIndices.length;
+  //   let colOffset = 0;
+  //   colsToBeAddedIndices.map((colIndex) => {
+  //     let newColIndex = colIndex + colOffset;
+  //     for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+  //       rows[rowIndex].splice(newColIndex, 0, ".");
+  //     }
+  //     galaxyCoordinates = galaxyCoordinates.map((coord: Coordinate) => {
+  //       if (coord.x >= newColIndex) {
+  //         coord.x += 1;
+  //       }
+  //       return coord;
+  //     });
+  //     colOffset++;
+  //   });
+  //   let insertionRow = Array(colCount).fill(".");
+  //   let rowOffset = 0;
+  //   rowsToBeAddedIndices.map((rowIndex) => {
+  //     let newRowIndex = rowIndex + rowOffset;
+  //     rows.splice(newRowIndex + rowOffset, 0, insertionRow);
+  //     rowOffset++;
+  //     galaxyCoordinates = galaxyCoordinates.map((coord: Coordinate) => {
+  //       if (coord.y >= newRowIndex) {
+  //         coord.y += 1;
+  //       }
+  //       return coord;
+  //     });
+  //   });
+  //   let riseRuns: Map<string, RiseRun> = new Map();
+  //   galaxyCoordinates.map((firstCoord) => {
+  //     galaxyCoordinates.map((secondCoord) => {
+  //       if (firstCoord !== secondCoord) {
+  //         let lineID = `${firstCoord.x}:${firstCoord.y}-${secondCoord.x}:${secondCoord.y}`;
+  //         let altLineID = `${secondCoord.x}:${secondCoord.y}-${firstCoord.x}:${firstCoord.y}`;
+  //         if (!riseRuns.get(lineID) && !riseRuns.get(altLineID)) {
+  //           riseRuns.set(lineID, {
+  //             moveX: secondCoord.x - firstCoord.x,
+  //             moveY: secondCoord.y - firstCoord.y,
+  //           });
+  //           total +=
+  //             Math.abs(secondCoord.x - firstCoord.x) +
+  //             Math.abs(secondCoord.y - firstCoord.y);
+  //         }
+  //       }
+  //     });
+  //   });
+  //   console.log(riseRuns);
+  // }
+
+  // Part Two
   function processInput(inputData: Array<string>) {
     let rows: Array<Array<string>> = [];
     let rowsToBeAddedIndices: Array<number> = [];
@@ -73,30 +149,27 @@
         colsToBeAddedIndices.push(x);
       }
     }
+    console.log(rowsToBeAddedIndices);
+    console.log(colsToBeAddedIndices);
     colCount += colsToBeAddedIndices.length;
     let colOffset = 0;
     colsToBeAddedIndices.map((colIndex) => {
       let newColIndex = colIndex + colOffset;
-      for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
-        rows[rowIndex].splice(newColIndex, 0, ".");
-      }
       galaxyCoordinates = galaxyCoordinates.map((coord: Coordinate) => {
         if (coord.x >= newColIndex) {
-          coord.x += 1;
+          coord.x += 999999;
         }
         return coord;
       });
-      colOffset++;
+      colOffset += 999999;
     });
-    let insertionRow = Array(colCount).fill(".");
     let rowOffset = 0;
     rowsToBeAddedIndices.map((rowIndex) => {
       let newRowIndex = rowIndex + rowOffset;
-      rows.splice(newRowIndex + rowOffset, 0, insertionRow);
-      rowOffset++;
+      rowOffset += 999999;
       galaxyCoordinates = galaxyCoordinates.map((coord: Coordinate) => {
         if (coord.y >= newRowIndex) {
-          coord.y += 1;
+          coord.y += 999999;
         }
         return coord;
       });
@@ -119,10 +192,8 @@
         }
       });
     });
-    console.log(riseRuns);
+    console.log(galaxyCoordinates, riseRuns);
   }
-
-  // Part Two
 </script>
 
 <div>
