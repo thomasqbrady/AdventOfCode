@@ -18,6 +18,10 @@
   let text = "";
   let inputArray: Array<string> = [];
 
+  function log(...stuff: Array<any>) {
+    text += stuff + "<br>";
+  }
+
   async function getInput() {
     const response = await fetch("day1/practice-part-one.txt");
     // const response = await fetch('day1/practice-part-two.txt');

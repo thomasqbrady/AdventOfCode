@@ -209,7 +209,7 @@
       currCol = currCol + move[1];
       steps++;
     }
-    console.log(doppleganger);
+    console.log(doppleganger.join('\n'));
     // for (let row = 0; row < doppleganger.length - 1; row++) {
     //   let foundCol = false;
     //   for (let col = 0; col < colCount; col++) {
