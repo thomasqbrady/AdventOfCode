@@ -117,9 +117,7 @@
       ) {
         let tileToCheck =
           map[row + directionMatrix[0]][col + directionMatrix[1]];
-        // console.log(tileToCheck);
         if (pipeTiles.includes(tileToCheck)) {
-          // console.log(roundCorner(direction, tileToCheck));
           return roundCorner(direction, tileToCheck);
         }
       }
@@ -129,7 +127,6 @@
 
   // Part One
   // function processInput(inputText: string) {
-  //   console.log(inputText);
   //   let inputData = inputText.split("\n");
   //   let startPosition = inputText.replace(/\n/g, "").indexOf("S");
   //   inputData.map((row, index) => {
@@ -141,9 +138,6 @@
   //   let move = findPipe(currRow, currCol);
   //   let direction = moveToCard.get(`[${move[0]}, ${move[1]}]`) ?? "NOMOVE";
   //   let nextTile = map[currRow + move[0]][currCol + move[1]];
-  //   // console.log(`from ${currRow}:${currCol} can go`);
-  //   // console.log(direction);
-  //   // console.log(`to ${nextTile} at ${currRow + move[0]}:${currCol + move[1]}`);
   //   let steps = 1;
   //   currRow = currRow + move[0];
   //   currCol = currCol + move[1];
@@ -152,9 +146,6 @@
   //     move = roundCorner(direction, map[currRow][currCol]);
   //     direction = moveToCard.get(`[${move[0]}, ${move[1]}]`) ?? "NOMOVE";
   //     nextTile = map[currRow + move[0]][currCol + move[1]];
-  //     // console.log(`from ${currRow}:${currCol} can go`);
-  //     // console.log(direction);
-  //     // console.log(
   //     //   `to ${nextTile} at ${currRow + move[0]}:${currCol + move[1]}`
   //     // );
   //     currRow = currRow + move[0];
@@ -168,9 +159,39 @@
     return str?.match(regex)?.length ?? 0;
   }
 
+  function sweep(
+    map: Array<Array<string>>,
+    rowIndex: number,
+    colIndex: number
+  ) {
+    let isOutside = false;
+    if (rowIndex > 0) {
+      if (map[rowIndex - 1][colIndex] === ".") {
+        isOutside = true;
+      }
+    }
+    if (rowIndex < map.length - 1) {
+      if (map[rowIndex + 1][colIndex] === ".") {
+        isOutside = true;
+      }
+    }
+    if (colIndex < colCount - 1) {
+      if (map[rowIndex][colIndex + 1] === ".") {
+        isOutside = true;
+      }
+    }
+    if (colIndex > 0) {
+      if (map[rowIndex][colIndex - 1] === ".") {
+        isOutside = true;
+      }
+    }
+    if (map[rowIndex][colIndex] === "O" && isOutside) {
+      map[rowIndex][colIndex] = ".";
+    }
+  }
+
   // Part Two
   function processInput(inputText: string) {
-    console.log(inputText);
     let inputData = inputText.split("\n");
     let startPosition = inputText.replace(/\n/g, "").indexOf("S");
     inputData.map((row, index) => {
@@ -178,7 +199,7 @@
       map.push(row.split(""));
     });
     let doppleganger: Array<Array<string>> = [];
-    for (let i = 0; i < map.length - 1; i++) {
+    for (let i = 0; i < map.length; i++) {
       let row: Array<string> = new Array(colCount).fill("O");
       doppleganger.push(row);
     }
@@ -188,177 +209,59 @@
     let move = findPipe(currRow, currCol);
     let direction = moveToCard.get(`[${move[0]}, ${move[1]}]`) ?? "NOMOVE";
     let nextTile = map[currRow + move[0]][currCol + move[1]];
-    // console.log(`from ${currRow}:${currCol} can go`);
-    // console.log(direction);
-    // console.log(`to ${nextTile} at ${currRow + move[0]}:${currCol + move[1]}`);
     let steps = 1;
     currRow = currRow + move[0];
     currCol = currCol + move[1];
-    // for (let i = 0; i < 100; i++) {
     while (nextTile !== "S") {
       doppleganger[currRow][currCol] = "*";
       move = roundCorner(direction, map[currRow][currCol]);
       direction = moveToCard.get(`[${move[0]}, ${move[1]}]`) ?? "NOMOVE";
       nextTile = map[currRow + move[0]][currCol + move[1]];
-      // console.log(`from ${currRow}:${currCol} can go`);
-      // console.log(direction);
-      // console.log(
-      //   `to ${nextTile} at ${currRow + move[0]}:${currCol + move[1]}`
-      // );
       currRow = currRow + move[0];
       currCol = currCol + move[1];
       steps++;
     }
-    console.log(doppleganger.join('\n'));
-    // for (let row = 0; row < doppleganger.length - 1; row++) {
-    //   let foundCol = false;
-    //   for (let col = 0; col < colCount; col++) {
-    //     if (doppleganger[row][col] === "*") {
-    //       foundCol = true;
-    //     }
-    //     if (!foundCol) {
-    //       doppleganger[row][col] = ".";
-    //     }
-    //   }
-    //   for (let col = colCount - 1; col >= 0; col--) {
-    //     if (doppleganger[row][col] === "*") {
-    //       foundCol = true;
-    //     }
-    //     if (!foundCol) {
-    //       doppleganger[row][col] = ".";
-    //     }
-    //   }
-    // }
-    // for (let row = doppleganger.length - 1; row >= 0; row--) {
-    //   let foundCol = false;
-    //   for (let col = 0; col < colCount; col++) {
-    //     // console.log(row, col, doppleganger.length, colCount, doppleganger[row]);
-    //     if (doppleganger[row][col] === "*") {
-    //       foundCol = true;
-    //     }
-    //     if (!foundCol) {
-    //       doppleganger[row][col] = ".";
-    //     }
-    //   }
-    //   for (let col = colCount - 1; col >= 0; col--) {
-    //     if (doppleganger[row][col] === "*") {
-    //       foundCol = true;
-    //     }
-    //     if (!foundCol) {
-    //       doppleganger[row][col] = ".";
-    //     }
-    //   }
-    // }
-    // for (let col = 0; col < colCount; col++) {
-    //   let foundRow = false;
-    //   for (let row = 0; row < doppleganger.length - 1; row++) {
-    //     if (doppleganger[row][col] === "*") {
-    //       foundRow = true;
-    //     }
-    //     if (!foundRow) {
-    //       doppleganger[row][col] = ".";
-    //     }
-    //   }
-    //   for (let row = doppleganger.length - 1; row >= 0; row--) {
-    //     if (doppleganger[row][col] === "*") {
-    //       foundRow = true;
-    //     }
-    //     if (!foundRow) {
-    //       doppleganger[row][col] = ".";
-    //     }
-    //   }
-    // }
-    // for (let col = colCount - 1; col >= 0; col--) {
-    //   let foundRow = false;
-    //   for (let row = 0; row < doppleganger.length - 1; row++) {
-    //     if (doppleganger[row][col] === "*") {
-    //       foundRow = true;
-    //     }
-    //     if (!foundRow) {
-    //       doppleganger[row][col] = ".";
-    //     }
-    //   }
-    //   for (let row = doppleganger.length - 1; row >= 0; row--) {
-    //     if (doppleganger[row][col] === "*") {
-    //       foundRow = true;
-    //     }
-    //     if (!foundRow) {
-    //       doppleganger[row][col] = ".";
-    //     }
-    //   }
-    // }
+    doppleganger[0].map((col, index) => {
+      if (col === "O") {
+        doppleganger[0][index] = ".";
+      }
+    });
+    doppleganger[doppleganger.length - 1].map((col, index) => {
+      if (col === "O") {
+        doppleganger[0][index] = ".";
+      }
+    });
+    doppleganger.map((row, rowIndex) => {
+      if (doppleganger[rowIndex][0] === "O") {
+        doppleganger[rowIndex][0] = ".";
+      }
+      if (doppleganger[rowIndex][colCount - 1] === "O") {
+        doppleganger[rowIndex][colCount - 1] = ".";
+      }
+    });
 
-    // for (let row = 0; row < doppleganger.length - 1; row++) {
-    //   let lastCol = ".";
-    //   for (let col = 0; col < colCount; col++) {
-    //     if (doppleganger[row][col] === "O" && lastCol === ".") {
-    //       doppleganger[row][col] = ".";
-    //       lastCol = ".";
-    //     } else {
-    //       lastCol = doppleganger[row][col];
-    //     }
-    //   }
-    //   for (let col = colCount - 1; col >= 0; col--) {
-    //     if (doppleganger[row][col] === "O" && lastCol === ".") {
-    //       doppleganger[row][col] = ".";
-    //       lastCol = ".";
-    //     } else {
-    //       lastCol = doppleganger[row][col];
-    //     }
-    //   }
-    // }
-    // for (let col = 0; col < colCount; col++) {
-    //   let lastCol = ".";
-    //   for (let row = 0; row < doppleganger.length - 1; row++) {
-    //     if (doppleganger[row][col] === "O" && lastCol === ".") {
-    //       doppleganger[row][col] = ".";
-    //       lastCol = ".";
-    //     } else {
-    //       lastCol = doppleganger[row][col];
-    //     }
-    //   }
-    //   for (let row = doppleganger.length - 1; row >= 0; row--) {
-    //     if (doppleganger[row][col] === "O" && lastCol === ".") {
-    //       doppleganger[row][col] = ".";
-    //       lastCol = ".";
-    //     } else {
-    //       lastCol = doppleganger[row][col];
-    //     }
-    //   }
-    // }
-
-    // for (let row = 0; row < doppleganger.length; row++) {
-    //   for (let col = 0; col < colCount; col++) {
-    //     if (doppleganger[row][col] === "O") {
-    //       for (let i = -1; i <= 1; i++) {
-    //         for (let j = -1; j <= 1; j++) {
-    //           let checkRow = row + i;
-    //           let checkCol = col + j;
-    //           if (checkRow < 0) checkRow = 0;
-    //           if (checkRow >= doppleganger.length)
-    //             checkRow = doppleganger.length - 1;
-    //           if (checkCol < 0) checkCol = 0;
-    //           if (checkCol >= colCount) checkCol = colCount - 1;
-    //           if (doppleganger[checkRow][checkCol] === ".") {
-    //             doppleganger[row][col] = ".";
-    //           }
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
-
-    // doppleganger.map((row) => {
-    //   console.log(JSON.stringify(row.join("")));
-    // });
-    // console.log(
-    //   doppleganger
-    //     .join("")
-    //     .replace(/,/g, "")
-    //     .replace(/\*O*./g, "")
-    //     .replace(/\*/g, "")
-    //     .replace(/\./g, "").length
-    // );
+    doppleganger.map((row, rowIndex) => {
+      row.map((col, colIndex) => {
+        sweep(doppleganger, rowIndex, colIndex);
+      });
+      for (let colIndex = colCount - 1; colIndex >= 0; colIndex--) {
+        sweep(doppleganger, rowIndex, colIndex);
+      }
+    });
+    for (let rowIndex = doppleganger.length - 1; rowIndex >= 0; rowIndex--) {
+      for (let colIndex = 0; colIndex < colCount; colIndex++) {
+        sweep(doppleganger, rowIndex, colIndex);
+      }
+      for (let colIndex = colCount - 1; colIndex >= 0; colIndex--) {
+        sweep(doppleganger, rowIndex, colIndex);
+      }
+    }
+    console.log(doppleganger.join("\n"));
+    doppleganger.map((row) => {
+      row.map((col) => {
+        total += col === "O" ? 1 : 0;
+      });
+    });
   }
 </script>
 
