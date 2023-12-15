@@ -18,7 +18,8 @@ export const nodes = [
 	() => import('./nodes/14'),
 	() => import('./nodes/15'),
 	() => import('./nodes/16'),
-	() => import('./nodes/17')
+	() => import('./nodes/17'),
+	() => import('./nodes/18')
 ];
 
 export const server_loads = [];
@@ -30,15 +31,16 @@ export const dictionary = {
 		"/day12": [7],
 		"/day13": [8],
 		"/day14": [9],
+		"/day15": [10],
 		"/day1": [4],
-		"/day2": [10],
-		"/day3": [11],
-		"/day4": [12],
-		"/day5": [13],
-		"/day6": [14],
-		"/day7": [15],
-		"/day8": [16],
-		"/day9": [17],
+		"/day2": [11],
+		"/day3": [12],
+		"/day4": [13],
+		"/day5": [14],
+		"/day6": [15],
+		"/day7": [16],
+		"/day8": [17],
+		"/day9": [18],
 		"/day": [3]
 	};
 
