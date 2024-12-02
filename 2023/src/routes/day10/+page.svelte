@@ -265,13 +265,10 @@
   }
 </script>
 
-<div>
-  <a href="/">Home</a>
-  <p><strong>{total}</strong></p>
-  <div class="flex flex-row">
-    <div class="basis-3/5 text-xs"></div>
-    <div class="basis-2/5">
-      <p>{@html text}</p>
-    </div>
+<p><strong>{total}</strong></p>
+<div class="flex flex-row">
+  <div class="basis-3/5 text-xs"></div>
+  <div class="basis-2/5">
+    <p>{@html text}</p>
   </div>
 </div>

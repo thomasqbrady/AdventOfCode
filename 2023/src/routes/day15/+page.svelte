@@ -121,7 +121,7 @@
     });
     map.forEach((box, boxNumber) => {
       let boxMultiplier = 1 + boxNumber;
-      box[1].forEach((focalLength, index) => {
+      box[1].forEach((focalLength: number, index: number) => {
         let focalPower = boxMultiplier * (1 + index) * focalLength;
         console.log(
           `${box[0][index]}: ${boxMultiplier} (box ${boxNumber}) * ${
@@ -134,15 +134,12 @@
   }
 </script>
 
-<div>
-  <a href="/">Home</a>
-  <p><strong>{total}</strong></p>
-  <div class="flex flex-row">
-    <div class="basis-3/5 text-xs">
-      <p class="font-mono">{inputText}</p>
-    </div>
-    <div class="basis-2/5">
-      <p>{@html text}</p>
-    </div>
+<p><strong>{total}</strong></p>
+<div class="flex flex-row">
+  <div class="basis-3/5 text-xs">
+    <p class="font-mono">{inputText}</p>
+  </div>
+  <div class="basis-2/5">
+    <p>{@html text}</p>
   </div>
 </div>

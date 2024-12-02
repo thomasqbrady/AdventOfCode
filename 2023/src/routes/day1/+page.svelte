@@ -122,11 +122,8 @@
   }
 </script>
 
-<div>
-  <a href="/">Home</a>
-  <p>{@html text}</p>
-  <p><strong>{total}</strong></p>
-</div>
+<p>{@html text}</p>
+<p><strong>{total}</strong></p>
 
 <style>
 </style>

@@ -208,17 +208,14 @@
   }
 </script>
 
-<div>
-  <a href="/">Home</a>
-  <p><strong>{total}</strong></p>
-  <div class="flex flex-row">
-    <div class="basis-3/5 text-xs">
-      <!-- {#each inputArray as line}
+<p><strong>{total}</strong></p>
+<div class="flex flex-row">
+  <div class="basis-3/5 text-xs">
+    <!-- {#each inputArray as line}
         <p class="font-mono">{@html line.replace(/\n/g, "<br>")}</p>
       {/each} -->
-    </div>
-    <div class="basis-2/5">
-      <p>{@html text}</p>
-    </div>
+  </div>
+  <div class="basis-2/5">
+    <p>{@html text}</p>
   </div>
 </div>
